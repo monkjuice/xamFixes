@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="xamFixes.Pages.Profile.EditProfile">
+    <ContentPage.Content>
+        <StackLayout>
+
+            <Button Clicked="MainPage" VerticalOptions="Start" HorizontalOptions="Start" BackgroundColor="Transparent" Text="Cancel"></Button>
+            
+            <Button x:Name="ChoosePicture"
+                Text="Choose from library"
+                VerticalOptions="CenterAndExpand" 
+                HorizontalOptions="CenterAndExpand"></Button>
+
+            <Button x:Name="TakePicture" 
+                Text="Camera"
+                VerticalOptions="CenterAndExpand" 
+                HorizontalOptions="CenterAndExpand"></Button>
+
+            <Image x:Name="ImagePreview"></Image>
+
+            <Button Command="{Binding SubmitCommand}"
+                Text="Upload"
+                VerticalOptions="CenterAndExpand" 
+                HorizontalOptions="CenterAndExpand"></Button>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

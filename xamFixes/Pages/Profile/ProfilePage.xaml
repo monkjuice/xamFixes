@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+			 x:Class="xamFixes.Pages.ProfilePage"
+			 IconImageSource="profile.png">
+    <ContentPage.Content>
+        <StackLayout>
+
+            <StackLayout Orientation="Horizontal" Padding="5,5,5,5">
+                <Button Command="{Binding LogoutCommand}" 
+                    VerticalOptions="Start" HorizontalOptions="Start"
+                    BackgroundColor="Transparent" Text="Log Out"
+                    >
+                </Button>
+
+                <Button Clicked="EditProfile_Clicked"
+                    Margin="0,10,10,0" 
+                    ImageSource="edit.png" 
+                    VerticalOptions="Start" HorizontalOptions="EndAndExpand" 
+                    BackgroundColor="Transparent" 
+                    WidthRequest="35" HeightRequest="35">
+                </Button>
+            </StackLayout>
+
+            <Frame HasShadow="False" WidthRequest="70" HeightRequest="70" CornerRadius="100" HorizontalOptions="Center" Margin="0,10,0,0">
+                <Image Source="{Binding ProfilePicture}" ></Image>
+            </Frame>
+
+            <Label Text="{Binding Username}" FontAttributes="Bold" TextColor="Black"
+                HorizontalOptions="CenterAndExpand" VerticalOptions="Center" FontSize="Medium" />
+
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
+

@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="xamFixes.Pages.RegisterPage"
+             Style="{StaticResource PageStyle}">
+    <ContentPage.Content>
+        <StackLayout BackgroundColor="White">
+
+            <StackLayout Padding="0,50,0,0">
+                <Image HorizontalOptions="Center" WidthRequest="200" Source="fixesLogo.png"/>
+            </StackLayout>
+
+            <StackLayout Spacing="20" Margin="0,20,0,0" x:Name="loginForm">
+
+                <Entry x:Name="username" Text="{Binding Username}" Placeholder="Username" WidthRequest="350" HorizontalOptions="Center" VerticalOptions="Center"
+                           PlaceholderColor="DimGray" 
+                           TextColor="Black"/>
+
+                <Entry  x:Name="password" Text="{Binding Password}" Placeholder="Password" WidthRequest="350" HorizontalOptions="Center" VerticalOptions="Center"
+                           PlaceholderColor="DimGray" 
+                           IsPassword="True"  
+                           TextColor="Black"
+                           />
+
+            </StackLayout>
+
+            <Button Command="{Binding SubmitRegister}" Text="Register" TextColor="Black"  
+                    FontSize="Large" HorizontalOptions="Center" Margin="0,20,0,0" WidthRequest="200"
+                    BackgroundColor="White" />
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
