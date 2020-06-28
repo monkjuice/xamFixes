@@ -67,8 +67,6 @@ namespace xamFixes.Pages.Profile
                 if (file == null)
                     return;
 
-                await DisplayAlert("File Location", file.Path, "OK");
-
                 vm.file = file;
 
                 ImagePreview.Source = ImageSource.FromStream(() =>
