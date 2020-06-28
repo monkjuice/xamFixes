@@ -1,11 +1,15 @@
-﻿using System;
+﻿using SQLite;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace xamFixes.Models
 {
-    public class UserProfile
+    public class User
     {
+        [PrimaryKey]
+        public int UserId { get; set; }
+
         public string Username { get; set; }
 
         public string ProfilePicturePath { get; set; }

@@ -56,7 +56,7 @@ namespace xamFixes.ViewModels
             if (!valid)
                 return;
 
-            var registerForm = new UserRegister();
+            var registerForm = new AuthUser();
 
             registerForm.Username = username;
             registerForm.Password = password;
@@ -67,7 +67,7 @@ namespace xamFixes.ViewModels
             }
             else
             {
-                var credentials = new UserLogin();
+                var credentials = new AuthUser();
                 credentials.Username = registerForm.Username;
                 credentials.Password = registerForm.Password;
 

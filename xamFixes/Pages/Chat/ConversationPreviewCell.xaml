@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="xamFixes.Pages.Chat.ConversationPreviewCell">
+    <ContentView.Content>
+        <StackLayout Orientation="Horizontal">
+            <StackLayout
+                HorizontalOptions="Center"
+                Orientation="Vertical"
+                VerticalOptions="Center">
+                <Image
+                    HeightRequest="55"
+                    HorizontalOptions="StartAndExpand"
+                    Source="profile.png"
+                    VerticalOptions="Center"
+                    WidthRequest="55">
+                </Image>
+            </StackLayout>
+            <StackLayout
+                Margin="10,0,0,0"
+                HorizontalOptions="FillAndExpand"
+                Orientation="Vertical"
+                VerticalOptions="Center">
+                <StackLayout  
+                    Margin="0,0,10,0"
+                    HorizontalOptions="FillAndExpand"
+                    Orientation="Horizontal"
+                    VerticalOptions="Center">
+                    <Label
+                        Text="Username"
+                        HeightRequest="55"
+                        HorizontalOptions="StartAndExpand"
+                        VerticalOptions="Center"
+                        WidthRequest="55">
+                    </Label>
+                    <Label
+                        FontSize="12"
+                        HorizontalOptions="EndAndExpand"
+                        Text="11/12/2020"
+                        TextColor="Gray"
+                        XAlign="End" />
+                </StackLayout>
+                <StackLayout
+                    Margin="0,0,10,10"
+                    HorizontalOptions="FillAndExpand"
+                    Orientation="Horizontal"
+                    VerticalOptions="Center">
+                    <!--<Image
+                        HeightRequest="15"
+                        HorizontalOptions="Start"
+                        IsVisible="{Binding ChatMetaData.MessageIsFromMe}"
+                        Source="tick.png" />-->
+                    <Label
+                        FontSize="15"
+                        HorizontalOptions="Start"
+                        Text="Buenas tardes Don Pepito"
+                        TextColor="Gray"
+                        XAlign="Start" />
+                    <!--<Image
+                        HeightRequest="20"
+                        HorizontalOptions="EndAndExpand"
+                        IsVisible="{Binding ChatPinned}"
+                        Source="pins.png"
+                        WidthRequest="20" />-->
+                </StackLayout>
+            </StackLayout>
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>

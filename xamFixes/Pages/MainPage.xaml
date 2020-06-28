@@ -21,7 +21,11 @@
     <local:NewPostPage />
 
     <local:DiscoverPage />
-    
-    <local:InboxPage />
-    
+
+    <NavigationPage Title="Messages" IconImageSource="mail.png">
+        <x:Arguments>
+            <local:InboxPage />
+        </x:Arguments>
+    </NavigationPage>
+
 </TabbedPage>   

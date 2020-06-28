@@ -17,7 +17,7 @@ namespace xamFixes.Services
     {
         private readonly HttpClient client = new HttpClient();
 
-        async public Task<UserProfile> GetUserProfile()
+        async public Task<User> GetUserProfile()
         {
             try
             {
@@ -43,7 +43,7 @@ namespace xamFixes.Services
                     return null;
                 }
 
-                return JsonConvert.DeserializeObject<UserProfile>(response.Message["Profile"].ToString());
+                return JsonConvert.DeserializeObject<User>(response.Message["Profile"].ToString());
 
             }
             catch (Exception e)

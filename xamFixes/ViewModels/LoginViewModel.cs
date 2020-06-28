@@ -56,7 +56,7 @@ namespace xamFixes.ViewModels
             if (!valid)
                 return;
 
-            var credentials = new UserLogin();
+            var credentials = new AuthUser();
 
             credentials.Username = username;
             credentials.Password = password;

@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="xamFixes.Pages.InboxPage"
+             xmlns:cell="clr-namespace:xamFixes.Pages.Chat"
+             xmlns:viewModels="clr-namespace:xamFixes.ViewModels"
+             IconImageSource="mail.png"
+             Title="Messages">
+
+    <ContentPage.BindingContext>
+        <viewModels:InboxViewModel/>
+    </ContentPage.BindingContext>
+    
+    <ContentPage.Content>
+        <ContentView>
+            <StackLayout>
+                <!--<SearchBar Placeholder="Search items..." VerticalOptions="Start"/>-->
+                <ListView
+                    CachingStrategy="RecycleElement"
+                    HasUnevenRows="False"
+                    ItemsSource="{Binding Messages}"
+                    RowHeight="75"
+                    SelectionMode="None"
+                    SeparatorColor="Gray"
+                    SeparatorVisibility="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <cell:ConversationPreviewCell />
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackLayout>
+        </ContentView>
+    </ContentPage.Content>
+</ContentPage>

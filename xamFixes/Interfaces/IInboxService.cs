@@ -8,11 +8,8 @@ using xamFixes.Models;
 
 namespace xamFixes.Interfaces
 {
-    public interface IProfileService
+    public interface IInboxService
     {
-        Task<User> GetUserProfile();
-
-        Task<bool> UploadProfilePicture(MediaFile picture);
-
+        Task<List<Message>> GetLastConversations();
     }
 }

@@ -13,5 +13,9 @@
             <Setter Property="BarBackgroundColor" Value="DimGray"/>
             <Setter Property="BarTextColor" Value="White"/>
         </Style>
+        <Style TargetType="NavigationPage">
+            <Setter Property="BarBackgroundColor" Value="Black"></Setter>
+            <Setter Property="BarTextColor" Value="White"></Setter>
+        </Style>
     </Application.Resources>
 </Application>

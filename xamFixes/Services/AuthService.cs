@@ -15,7 +15,7 @@ namespace xamFixes.Services
     {
         private readonly HttpClient client = new HttpClient();
 
-        public async Task<bool> LoginAsync(UserLogin credentials)
+        public async Task<bool> LoginAsync(AuthUser credentials)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace xamFixes.Services
             }
         }
 
-        public async Task<bool> RegisterAsync(UserRegister credentials)
+        public async Task<bool> RegisterAsync(AuthUser credentials)
         {
             try
             {

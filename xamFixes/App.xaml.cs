@@ -3,6 +3,7 @@ using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using xamFixes.Interfaces;
+using xamFixes.Repository;
 using xamFixes.Services;
 
 namespace xamFixes
@@ -11,6 +12,7 @@ namespace xamFixes
     {
         public static bool IsUserLoggedIn { get; set; }
 
+        public static int UserId { get; set; }
 
         public App()
         {
@@ -19,14 +21,10 @@ namespace xamFixes
             var token = SecureStorage.GetAsync("fixes_token").Result;
 
             if (token != null)
-            {
                 IsUserLoggedIn = true;
-            }
             else
-            {
                 IsUserLoggedIn = false;
-            }
-
+            
             if (IsUserLoggedIn == false)
                 MainPage = new Pages.LoginPage();
             else

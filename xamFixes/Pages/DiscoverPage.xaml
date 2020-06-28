@@ -5,7 +5,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="xamFixes.Pages.DiscoverPage"
-             IconImageSource="search.png">
+             IconImageSource="search.png"
+             Title="Discover">
     <ContentPage.Content>
         <StackLayout>
             <Label Text="Welcome to Xamarin.Forms!"

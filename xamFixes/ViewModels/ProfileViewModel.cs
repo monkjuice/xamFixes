@@ -62,6 +62,7 @@ namespace xamFixes.ViewModels
         {
             var profile = await _profileService.GetUserProfile();
 
+            App.UserId = profile.UserId;
             Username = profile.Username;
             ProfilePicture = profile.ProfilePicturePath;
         }

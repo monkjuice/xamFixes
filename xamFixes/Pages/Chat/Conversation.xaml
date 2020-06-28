@@ -4,11 +4,12 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             x:Class="xamFixes.Pages.InboxPage"
-             IconImageSource="mail.png">
+             x:Class="xamFixes.Pages.Chat.Conversation">
     <ContentPage.Content>
         <StackLayout>
-            <SearchBar Placeholder="Search items..." VerticalOptions="Start"/>
+            <Label Text="Welcome to Xamarin.Forms!"
+                VerticalOptions="CenterAndExpand" 
+                HorizontalOptions="CenterAndExpand" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
