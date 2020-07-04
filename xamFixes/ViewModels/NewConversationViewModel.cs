@@ -13,10 +13,10 @@ using xamFixes.Services;
 
 namespace xamFixes.ViewModels
 {
-    class InboxViewModel : INotifyPropertyChanged
+    class NewConversationViewModel : INotifyPropertyChanged
     {
 
-        private readonly IInboxService _inboxService;
+        private readonly IFriendService _friendService;
         public event PropertyChangedEventHandler PropertyChanged;
 
         void OnPropertyChanged(string name)
@@ -24,32 +24,32 @@ namespace xamFixes.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public InboxViewModel()
+        public NewConversationViewModel()
         {
-            _inboxService = new InboxService();
+            _friendService = new FriendService();
 
-            GetLastConversations();
+            GetFriendsList();
         }
 
-        List<ConversationVM> conversations = new List<ConversationVM>();
+        List<User> contacts = new List<User>();
 
-        public List<ConversationVM> Conversations
+        public List<User> Contacts
         {
-            get => conversations;
+            get => contacts;
             set
             {
-                conversations = value;
-                OnPropertyChanged(nameof(Conversations));
+                contacts = value;
+                OnPropertyChanged(nameof(Contacts));
             }
         }
 
-        async Task GetLastConversations()
+        async Task GetFriendsList()
         {
             try
             {
-                Conversations = await _inboxService.GetLastConversations(App.AuthenticatedUser.UserId);
+                Contacts = await _friendService.GetFriendsList(App.AuthenticatedUser.UserId);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }

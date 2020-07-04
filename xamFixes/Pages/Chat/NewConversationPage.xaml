@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:xamFixes.ViewModels"
+             xmlns:chatTemplates="clr-namespace:xamFixes.Pages.Chat.Templates"
+             mc:Ignorable="d"
+             x:Class="xamFixes.Pages.Chat.NewConversationPage">
+
+    <ContentPage.BindingContext>
+        <viewModels:NewConversationViewModel/>
+    </ContentPage.BindingContext>
+    
+        <ContentPage.Content>
+                <ContentView>
+                    <StackLayout>
+                        <SearchBar Placeholder="Search.." VerticalOptions="Start"/>
+                        <ListView
+                        CachingStrategy="RecycleElement"
+                        HasUnevenRows="False"
+                        ItemsSource="{Binding Contacts}"
+                        ItemTapped="ContactTapped"
+                        RowHeight="75"
+                        SelectionMode="None"
+                        SeparatorVisibility="Default"
+                        Margin="10,20,0,0">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <ViewCell>
+                                        <chatTemplates:ContactPreviewCell />
+                                    </ViewCell>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+                </StackLayout>
+                </ContentView>
+        </ContentPage.Content>
+</ContentPage>

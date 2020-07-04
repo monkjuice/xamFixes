@@ -4,9 +4,9 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             x:Class="xamFixes.Pages.Chat.ConversationPreviewCell">
+             x:Class="xamFixes.Pages.Chat.Templates.ConversationPreviewCell">
     <ContentView.Content>
-        <StackLayout Orientation="Horizontal">
+        <StackLayout Orientation="Horizontal" Padding="0,10,0,10">
             <StackLayout
                 HorizontalOptions="Center"
                 Orientation="Vertical"
@@ -14,49 +14,52 @@
                 <Image
                     HeightRequest="55"
                     HorizontalOptions="StartAndExpand"
-                    Source="profile.png"
+                    Source="{Binding RecipientProfilePicturePath}"
                     VerticalOptions="Center"
                     WidthRequest="55">
                 </Image>
             </StackLayout>
+
             <StackLayout
-                Margin="10,0,0,0"
+                Margin="0,0,0,0"
                 HorizontalOptions="FillAndExpand"
                 Orientation="Vertical"
                 VerticalOptions="Center">
                 <StackLayout  
-                    Margin="0,0,10,0"
+                    Margin="0,0,0,1"
                     HorizontalOptions="FillAndExpand"
                     Orientation="Horizontal"
                     VerticalOptions="Center">
                     <Label
-                        Text="Username"
-                        HeightRequest="55"
-                        HorizontalOptions="StartAndExpand"
-                        VerticalOptions="Center"
-                        WidthRequest="55">
-                    </Label>
+                        Text="{Binding RecipientUsername}"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" 
+                        TextColor="Black"
+                        FontAttributes="Bold"/>
+
                     <Label
                         FontSize="12"
                         HorizontalOptions="EndAndExpand"
-                        Text="11/12/2020"
+                        Padding="0,0,30,0"
+                        Text="{Binding LastActivity}"
                         TextColor="Gray"
                         XAlign="End" />
                 </StackLayout>
                 <StackLayout
-                    Margin="0,0,10,10"
+                    Margin="0,0,0,0"
                     HorizontalOptions="FillAndExpand"
                     Orientation="Horizontal"
                     VerticalOptions="Center">
-                    <!--<Image
-                        HeightRequest="15"
-                        HorizontalOptions="Start"
-                        IsVisible="{Binding ChatMetaData.MessageIsFromMe}"
-                        Source="tick.png" />-->
                     <Label
                         FontSize="15"
                         HorizontalOptions="Start"
-                        Text="Buenas tardes Don Pepito"
+                        FontAttributes="{Binding FontStyle}"
+                        Text="{Binding Icon}" />
+                    <Label
+                        FontSize="15"
+                        HorizontalOptions="Start"
+                        FontAttributes="{Binding FontStyle}"
+                        Text="{Binding MessageBody}"
                         TextColor="Gray"
                         XAlign="Start" />
                     <!--<Image
@@ -66,6 +69,19 @@
                         Source="pins.png"
                         WidthRequest="20" />-->
                 </StackLayout>
+                <StackLayout
+                    Margin="0,15,0,0" Padding="40,0,0,0"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Start">
+                    <BoxView 
+                            VerticalOptions="Center"
+                            HorizontalOptions="Start"
+                            HeightRequest=".5"
+                            WidthRequest= "250"  
+                            Color="LightGray"
+                            IsVisible="False"></BoxView>
+                </StackLayout>
+
             </StackLayout>
         </StackLayout>
     </ContentView.Content>

@@ -7,7 +7,7 @@ namespace xamFixes.Repository
 {
     public static class Constants
     {
-        public const string DatabaseFilename = "Fixes5.db3";
+        public static string DatabaseFilename = string.Format("{0}.db3", App.AuthenticatedUser.UserId);
 
         public const SQLite.SQLiteOpenFlags Flags =
             // open the database in read/write mode

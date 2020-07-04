@@ -15,7 +15,7 @@ namespace xamFixes.Services
     {
         private readonly HttpClient client = new HttpClient();
 
-        public async Task<bool> LoginAsync(AuthUser credentials)
+        public async Task<User> LoginAsync(AuthUser credentials)
         {
             try
             {
@@ -34,19 +34,19 @@ namespace xamFixes.Services
 
                 var response = JsonConvert.DeserializeObject<Base.Response>(jsonString);
 
-                if (msg.IsSuccessStatusCode == false || response.Error == true)
+                if (msg.IsSuccessStatusCode == false || response.Error == true || response.Message == null)
                 {
-                    return false;
+                    return null;
                 }
 
                 await SecureStorage.SetAsync("fixes_token", response.Message["_token"].ToString());
 
-                return true;
+                return JsonConvert.DeserializeObject<User>(response.Message["User"].ToString());
 
             }
             catch (Exception e)
             {
-                return false;
+                return null;
             }
         }
 

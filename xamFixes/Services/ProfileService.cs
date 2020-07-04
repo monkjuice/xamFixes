@@ -17,7 +17,7 @@ namespace xamFixes.Services
     {
         private readonly HttpClient client = new HttpClient();
 
-        async public Task<User> GetUserProfile()
+        async public Task<User> GetUserProfile(int userId)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace xamFixes.Services
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-                var stringTask = client.GetAsync(Base.baseURL + "/api/user/profile");
+                var stringTask = client.GetAsync(Base.baseURL + $"/api/user/profile?userId={userId}");
 
                 var msg = await stringTask;
 

@@ -61,12 +61,16 @@ namespace xamFixes.ViewModels
             credentials.Username = username;
             credentials.Password = password;
 
-            if (await _authService.LoginAsync(credentials) == false)
+            var user = await _authService.LoginAsync(credentials);
+            if (user == null)
             {
                 DisplayError("Invalid username/password");
             }
             else
             {
+                App.IsUserLoggedIn = true;
+                App.AuthenticatedUser = user;
+
                 LoggedIn();
             }
         }

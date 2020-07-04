@@ -12,11 +12,13 @@ namespace xamFixes.Models
 
         public int ConversationId { get; set; }
 
-        public string MessageBody { get; set; }
+        public string Body { get; set; }
 
         public bool Unread { get; set; }
 
         public int UserId { get; set; }
+
+        public DateTime CreatedAt { get; set; }
 
     }
 }

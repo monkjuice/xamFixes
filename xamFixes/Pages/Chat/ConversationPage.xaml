@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:chatTemplates="clr-namespace:xamFixes.Pages.Chat.Templates" 
+             xmlns:controls="clr-namespace:xamFixes.Controls"
+             mc:Ignorable="d"
+             x:Class="xamFixes.Pages.Chat.ConversationPage"
+             Title="{Binding RecipientName}"
+             IconImageSource="{Binding RecipientProfilePicturePath}"
+             >
+    
+    <ContentPage.Content>
+            <ContentView>
+                <StackLayout>
+                    <StackLayout>
+                        <ListView
+                                CachingStrategy="RecycleElement"
+                                HasUnevenRows="True"
+                                ItemsSource="{Binding Messages}"
+                                SelectionMode="None"
+                                SeparatorVisibility="None">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <ViewCell>
+                                        <chatTemplates:MessageBubble />
+                                    </ViewCell>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackLayout>
+
+                    <Frame CornerRadius="50" Padding="5" Margin="5,0,5,10">
+                        <StackLayout Orientation="Horizontal">
+
+                            <Frame HasShadow="False" CornerRadius="20" Padding="5" IsClippedToBounds="True"  HorizontalOptions="FillAndExpand">
+                                <Entry FontSize="15" BackgroundColor="White" Placeholder="Message.." TextColor="White"></Entry>
+                            </Frame>
+                            
+                            <Button BackgroundColor="Transparent" WidthRequest="50" HorizontalOptions="End" CornerRadius="100" ImageSource="camera.png"></Button>
+                        </StackLayout>
+                    </Frame>
+
+                </StackLayout>
+            </ContentView>
+
+    </ContentPage.Content>
+</ContentPage>

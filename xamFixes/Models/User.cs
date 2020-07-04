@@ -7,7 +7,7 @@ namespace xamFixes.Models
 {
     public class User
     {
-        [PrimaryKey]
+        [PrimaryKey, AutoIncrement]
         public int UserId { get; set; }
 
         public string Username { get; set; }

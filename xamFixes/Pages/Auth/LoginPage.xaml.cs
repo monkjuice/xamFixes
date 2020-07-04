@@ -42,7 +42,6 @@ namespace xamFixes.Pages
 
         public void LoggedIn()
         {
-            App.IsUserLoggedIn = true;
             Application.Current.MainPage = new MainPage(); 
         }
 

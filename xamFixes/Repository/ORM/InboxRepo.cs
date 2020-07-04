@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using xamFixes.Models;
+using xamFixes.Repository.ViewModel;
 
 namespace xamFixes.Repository.ORM
 {
@@ -21,7 +23,7 @@ namespace xamFixes.Repository.ORM
             }
         }
 
-        public Task<int> SaveUsersInConversationAsync(UsersInConversation uic)
+        public Task<int> SaveUserInConversationAsync(UserInConversation uic)
         {
             return Database.InsertAsync(uic);
         }
@@ -31,22 +33,63 @@ namespace xamFixes.Repository.ORM
             return Database.InsertAsync(msg);
         }
 
-
-        public Task<List<Message>> GetLastConversations(int userId)
+        async public Task<List<Conversation>> GetLastConversations(int userId)
         {
-            return Database.QueryAsync<Message>(string.Format(@"Select * from Conversation c
-                                                join UsersInConversation uc on uc.ConversationId = c.ConversationId
-                                                join Message m on m.ConversationId = uc.ConversationId
-                                                where uc.UserId = {0}
-                                                group by c.ConversationId
-                                                order by LastActivity desc limit 5", userId));
+            try
+            {
+                var conversations = await Database.QueryAsync<Conversation>("Select * from Conversation;");
+
+                return conversations;
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
         }
 
-        public Task<List<Message>> GetLastMessagesOfConversation(int conversationId)
+        async public Task<List<UserInConversation>> GetConversationParticipants(int conversationId, int userId)
         {
-            return Database.QueryAsync<Message>(string.Format(@"Select * from Messages
-                                                where ConversationId = {0}
-                                                order by MessageId desc limit 5", conversationId));
+            try
+            {
+                var usersInConv = await Database.QueryAsync<UserInConversation>($@"Select * from UserInConversation uc
+                    where uc.ConversationId = {conversationId} and uc.UserId is not {userId};");
+
+                return usersInConv;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        async public Task<Message> GetConversationLastMessage(int conversationId)
+        {
+            try
+            {
+                var msg = await Database.QueryAsync<Message>($@"Select * from Message m
+                    where m.ConversationId = {conversationId} order by m.MessageId desc limit 1;");
+
+                return msg.FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        async public Task<List<Message>> GetLastMessagesOfConversation(int conversationId)
+        {
+            try 
+            { 
+                var t = await Database.QueryAsync<Message>($@"Select * from Message
+                                                                        where ConversationId = {conversationId}
+                                                                        order by MessageId asc limit 30;");
+                return t;
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
         }
 
     }

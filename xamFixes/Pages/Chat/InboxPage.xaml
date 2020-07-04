@@ -5,7 +5,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="xamFixes.Pages.InboxPage"
-             xmlns:cell="clr-namespace:xamFixes.Pages.Chat"
+             xmlns:controls="clr-namespace:xamFixes.Controls"
+             xmlns:chatTemplates="clr-namespace:xamFixes.Pages.Chat.Templates"
              xmlns:viewModels="clr-namespace:xamFixes.ViewModels"
              IconImageSource="mail.png"
              Title="Messages">
@@ -15,26 +16,53 @@
     </ContentPage.BindingContext>
     
     <ContentPage.Content>
-        <ContentView>
-            <StackLayout>
-                <!--<SearchBar Placeholder="Search items..." VerticalOptions="Start"/>-->
-                <ListView
-                    CachingStrategy="RecycleElement"
-                    HasUnevenRows="False"
-                    ItemsSource="{Binding Messages}"
-                    RowHeight="75"
-                    SelectionMode="None"
-                    SeparatorColor="Gray"
-                    SeparatorVisibility="None">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <ViewCell>
-                                <cell:ConversationPreviewCell />
-                            </ViewCell>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </StackLayout>
-        </ContentView>
+        <RelativeLayout>
+            <ContentView>
+                <StackLayout>
+                    <SearchBar Placeholder="Search.." VerticalOptions="Start"/>
+                    <ListView
+                        CachingStrategy="RecycleElement"
+                        HasUnevenRows="False"
+                        ItemsSource="{Binding Conversations}"
+                        ItemTapped="ConversationTapped"
+                        RowHeight="75"
+                        SelectionMode="None"
+                        SeparatorVisibility="Default"
+                        Margin="10,20,0,0">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <chatTemplates:ConversationPreviewCell />
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <!--<StackLayout VerticalOptions="End">
+
+                        <Button Clicked="LoadTestMessages" Text="Load Test Messages"></Button>
+
+                        <Button Clicked="LoadAllConvos" Text="Test Conversaciones"></Button>
+
+                        <Button Clicked="CopyDatabase" Text="Copiar BDD"></Button>
+                    </StackLayout>-->
+
+                </StackLayout>
+            </ContentView>
+            <controls:FloatingActionButton
+                x:Name="FAB"
+                ButtonColor="Black"
+                Clicked="NewConversation"
+                Image="messageWhite.png"
+                TextColor="White"
+                RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToParent,
+                                                                  Property=Width,
+                                                                  Factor=1,
+                                                                  Constant=-105}"
+                RelativeLayout.YConstraint="{ConstraintExpression Type=RelativeToParent,
+                                                                  Property=Height,
+                                                                  Factor=1,
+                                                                  Constant=-105}" />
+        </RelativeLayout>
     </ContentPage.Content>
 </ContentPage>

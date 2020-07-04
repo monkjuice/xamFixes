@@ -9,7 +9,7 @@ namespace xamFixes.Interfaces
     public interface IAuthService
     {
 
-        Task<bool> LoginAsync(AuthUser credentials);
+        Task<User> LoginAsync(AuthUser credentials);
         Task<bool> RegisterAsync(AuthUser credentials);
 
     }

@@ -5,10 +5,10 @@ using System.Text;
 
 namespace xamFixes.Models
 {
-    public class UsersInConversation
+    public class UserInConversation
     {
         [PrimaryKey, AutoIncrement]
-        public int UsersInConversationId { get; set; }
+        public int UserInConversationId { get; set; }
 
         public int ConversationId { get; set; }
 

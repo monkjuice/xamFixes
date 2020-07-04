@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using xamFixes.Tests;
 using xamFixes.ViewModels;
 
 namespace xamFixes.Pages
@@ -19,6 +20,17 @@ namespace xamFixes.Pages
             var vm = new ProfileViewModel();
             this.BindingContext = vm;
             vm.LoggedOut += () => LoggedOut();
+
+            try
+            { 
+            var dn = new SeedDummyData();
+
+            //dn.Execute();
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
 
         }
 

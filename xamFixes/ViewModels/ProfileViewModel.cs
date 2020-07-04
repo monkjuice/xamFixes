@@ -31,8 +31,7 @@ namespace xamFixes.ViewModels
 
             LogoutCommand = new Command(Logout);
 
-            if (_username == string.Empty)
-                _ = GetUserProfile();
+            SetUserProfile();
         }
 
         string _username = string.Empty;
@@ -58,19 +57,17 @@ namespace xamFixes.ViewModels
             }
         }
 
-        async Task GetUserProfile()
+        void SetUserProfile()
         {
-            var profile = await _profileService.GetUserProfile();
-
-            App.UserId = profile.UserId;
-            Username = profile.Username;
-            ProfilePicture = profile.ProfilePicturePath;
+            Username = App.AuthenticatedUser.Username;
+            ProfilePicture = App.AuthenticatedUser.ProfilePicturePath;
         }
 
         void Logout()
         {
-            App.IsUserLoggedIn = false;
             SecureStorage.Remove("fixes_token");
+            App.IsUserLoggedIn = false;
+            App.AuthenticatedUser = null;
             LoggedOut();
         }
 

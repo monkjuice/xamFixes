@@ -8,11 +8,9 @@ using xamFixes.Models;
 
 namespace xamFixes.Interfaces
 {
-    public interface IProfileService
+    public interface IFriendService
     {
-        Task<User> GetUserProfile(int userId);
-
-        Task<bool> UploadProfilePicture(MediaFile picture);
+        Task<List<User>> GetFriendsList(int userId);
 
     }
 }

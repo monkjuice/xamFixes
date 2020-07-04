@@ -10,11 +10,16 @@ using Xamarin.Forms.Xaml;
 namespace xamFixes.Pages.Chat
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class Conversation : ContentPage
+    public partial class NewConversationPage : ContentPage
     {
-        public Conversation()
+        public NewConversationPage()
         {
             InitializeComponent();
+        }
+
+        private void ContactTapped(object sender, ItemTappedEventArgs e)
+        {
+
         }
     }
 }
