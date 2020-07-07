@@ -1,11 +1,10 @@
-﻿using SQLite;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace xamFixes.Models
 {
-    public class User
+    public class DiscoverSearchResult
     {
 
         public int UserId { get; set; }

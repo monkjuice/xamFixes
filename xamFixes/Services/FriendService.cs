@@ -30,7 +30,7 @@ namespace xamFixes.Services
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-                var stringTask = client.GetAsync(Base.baseURL + $"/api/friendship/getfriendslist?userId={userId}");
+                var stringTask = client.GetAsync(Base.baseURL + $"/api/friendship/friendslist?userId={userId}");
 
                 var msg = await stringTask;
 

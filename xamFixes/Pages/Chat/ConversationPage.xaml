@@ -35,10 +35,10 @@
                         <StackLayout Orientation="Horizontal">
 
                             <Frame HasShadow="False" CornerRadius="20" Padding="5" IsClippedToBounds="True"  HorizontalOptions="FillAndExpand">
-                                <Entry FontSize="15" BackgroundColor="White" Placeholder="Message.." TextColor="White"></Entry>
+                                <Entry TextColor="Black" FontSize="15" Text="{Binding UnsentBody}" BackgroundColor="White" Placeholder="Message.."></Entry>
                             </Frame>
-                            
-                            <Button BackgroundColor="Transparent" WidthRequest="50" HorizontalOptions="End" CornerRadius="100" ImageSource="camera.png"></Button>
+                        <Button IsEnabled="{Binding EnabledSend}" Command="{Binding SendMessageCommand}" BackgroundColor="Transparent" WidthRequest="50" HorizontalOptions="End" CornerRadius="100" Text="Send"></Button>
+                        <Button BackgroundColor="Transparent" WidthRequest="50" HorizontalOptions="End" CornerRadius="100" ImageSource="camera.png"></Button>
                         </StackLayout>
                     </Frame>
 

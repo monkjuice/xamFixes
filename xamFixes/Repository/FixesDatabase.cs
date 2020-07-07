@@ -14,7 +14,7 @@ namespace xamFixes.Repository
     {
         static readonly Lazy<SQLiteAsyncConnection> lazyInitializer = new Lazy<SQLiteAsyncConnection>(() =>
         {
-            //File.Delete("/data/user/0/com.companyname.xamfixes/files/.local/share/1.db3");
+            //File.Delete($"/data/user/0/com.companyname.xamfixes/files/.local/share/{App.AuthenticatedUser.UserId}.db3");
             return new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
         });
 
@@ -32,7 +32,6 @@ namespace xamFixes.Repository
             {
                 if (!Database.TableMappings.Any(m => m.MappedType.Name == typeof(User).Name))
                 {
-                    await Database.CreateTablesAsync(CreateFlags.None, typeof(User));
                     await Database.CreateTablesAsync(CreateFlags.None, typeof(Conversation));
                     await Database.CreateTablesAsync(CreateFlags.None, typeof(UserInConversation));
                     await Database.CreateTablesAsync(CreateFlags.None, typeof(Message));

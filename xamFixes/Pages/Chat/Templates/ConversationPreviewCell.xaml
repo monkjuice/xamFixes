@@ -6,22 +6,18 @@
              mc:Ignorable="d"
              x:Class="xamFixes.Pages.Chat.Templates.ConversationPreviewCell">
     <ContentView.Content>
-        <StackLayout Orientation="Horizontal" Padding="0,10,0,10">
-            <StackLayout
-                HorizontalOptions="Center"
-                Orientation="Vertical"
-                VerticalOptions="Center">
-                <Image
-                    HeightRequest="55"
-                    HorizontalOptions="StartAndExpand"
-                    Source="{Binding RecipientProfilePicturePath}"
-                    VerticalOptions="Center"
-                    WidthRequest="55">
-                </Image>
+        <StackLayout Orientation="Horizontal" Padding="0,0,0,0">
+            <StackLayout>
+                <Frame IsClippedToBounds="True" Padding="0" CornerRadius="100" HasShadow="False" WidthRequest="55" HeightRequest="55" HorizontalOptions="Center">
+                        <Image
+                        Aspect="AspectFill"
+                        Source="{Binding RecipientProfilePicturePath}">
+                        </Image>
+                </Frame>
             </StackLayout>
 
             <StackLayout
-                Margin="0,0,0,0"
+                Margin="10,0,0,0"
                 HorizontalOptions="FillAndExpand"
                 Orientation="Vertical"
                 VerticalOptions="Center">

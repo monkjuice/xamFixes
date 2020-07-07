@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -28,12 +31,47 @@ namespace xamFixes.ViewModels
         {
             _inboxService = new InboxService();
 
-            GetLastConversations();
+            _ = ConfigureHub();
+
+            _ = GetLastConversations();
         }
 
-        List<ConversationVM> conversations = new List<ConversationVM>();
+        async Task ConfigureHub()
+        {
+            hubConnection = new HubConnectionBuilder()
+                                 .WithUrl($"https://fixesapi-dev.azurewebsites.net/chatHub", options =>
+                                 {
+                                     options.AccessTokenProvider = async () => await Task.FromResult(await SecureStorage.GetAsync("fixes_token"));
+                                 })
+                                 .Build();
 
-        public List<ConversationVM> Conversations
+            await hubConnection.StartAsync();
+
+            hubConnection.On<string, string>("RecieveMessage", async (message, userid) =>
+            {
+                var convo = await _inboxService.FindConversation(int.Parse(userid));
+
+                if (convo != null)
+                { 
+                    Conversations.Where(x => x.ConversationId == convo.ConversationId).First().MessageBody = message;
+
+                    _ = _inboxService.StoreMessage(_inboxService.CreateMessage(message, int.Parse(userid)), convo.ConversationId, convo.UserId);
+                }
+                else
+                {
+                    _ =  _inboxService.StoreMessage(_inboxService.CreateMessage(message, int.Parse(userid)), 0, int.Parse(userid));
+
+                    convo = await _inboxService.CreateConversation(await _inboxService.FindConversation(int.Parse(userid)));
+
+                    Conversations.Add(await _inboxService.CreateConversation(convo));
+                }
+            });
+        }
+
+        ObservableCollection<ConversationVM> conversations = new ObservableCollection<ConversationVM>();
+        private HubConnection hubConnection;
+
+        public ObservableCollection<ConversationVM> Conversations
         {
             get => conversations;
             set

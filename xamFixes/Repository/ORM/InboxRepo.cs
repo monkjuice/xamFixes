@@ -11,15 +11,16 @@ namespace xamFixes.Repository.ORM
     public class InboxRepo : FixesDatabase
     {
 
-        public Task<int> SaveConversationAsync(Conversation conversation)
+        async public Task<int> SaveConversationAsync(Conversation conversation)
         {
             if (conversation.ConversationId != 0)
             {
-                return Database.UpdateAsync(conversation);
+                return await Database.UpdateAsync(conversation);
             }
             else
             {
-                return Database.InsertAsync(conversation);
+                var t = await Database.InsertAsync(conversation);
+                return conversation.ConversationId;
             }
         }
 
@@ -30,7 +31,14 @@ namespace xamFixes.Repository.ORM
 
         public Task<int> SaveMessage(Message msg)
         {
-            return Database.InsertAsync(msg);
+            try 
+            { 
+                return Database.InsertAsync(msg);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
         }
 
         async public Task<List<Conversation>> GetLastConversations(int userId)
@@ -47,6 +55,12 @@ namespace xamFixes.Repository.ORM
             }
         }
 
+        /// <summary>
+        /// Returns conversations in a conversation except for logged in user
+        /// </summary>
+        /// <param name="conversationId"></param>
+        /// <param name="userId">Logged in user id</param>
+        /// <returns>List of UserInConversation</returns>
         async public Task<List<UserInConversation>> GetConversationParticipants(int conversationId, int userId)
         {
             try
@@ -90,6 +104,18 @@ namespace xamFixes.Repository.ORM
             {
                 throw e;
             }
+        }
+
+        async public Task<ConversationVM> FindConversation(int userId)
+        {
+            var t = await Database.QueryAsync<ConversationVM>($@"Select c.ConversationId, c.LastActivity 
+                                                                        from UserInConversation uc
+                                                                        join Conversation c on c.ConversationId = uc.ConversationId
+                                                                        where uc.UserId = {userId} limit 1;");
+            if (t.Count() > 0)
+                return t.First();
+
+            return null;
         }
 
     }

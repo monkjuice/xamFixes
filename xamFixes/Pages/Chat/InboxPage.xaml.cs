@@ -23,9 +23,8 @@ namespace xamFixes.Pages
 
         private void CopyDatabase(object sender, EventArgs e)
         {
-
-            string outputPath = "/sdcard/1.db3";
-            string dbPath = "/data/data/com.companyname.xamfixes/files/.local/share/1.db3";
+            string outputPath = "/sdcard/" + App.AuthenticatedUser.UserId + ".db3";
+            string dbPath = Path.Combine("/data/data/com.companyname.xamfixes/files/.local/share", App.AuthenticatedUser.UserId + ".db3");
 
             if (File.Exists(outputPath))
                 File.Delete(outputPath);

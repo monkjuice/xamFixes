@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -22,13 +23,13 @@ namespace xamFixes.Services
             _profileService = new ProfileService();
         }
 
-        async public Task<List<ConversationVM>> GetLastConversations(int userId)
+        async public Task<ObservableCollection<ConversationVM>> GetLastConversations(int userId)
         {
             var db = new InboxRepo();
 
             var conversations = await db.GetLastConversations(userId);
 
-            var conversationsPreview = new List<ConversationVM>();
+            var conversationsPreview = new ObservableCollection<ConversationVM>();
 
             foreach (var c in conversations)
             {
@@ -55,13 +56,13 @@ namespace xamFixes.Services
             return conversationsPreview;
         }
 
-        async public Task<List<MessageVM>> GetConversationLastMessages(int conversationId)
+        async public Task<ObservableCollection<MessageVM>> GetConversationLastMessages(int conversationId)
         {
             var db = new InboxRepo();
 
             var _messages = await db.GetLastMessagesOfConversation(conversationId);
 
-            var messages = new List<MessageVM>();
+            var messages = new ObservableCollection<MessageVM>();
 
             foreach(var m in _messages)
             {
@@ -69,7 +70,7 @@ namespace xamFixes.Services
                 {
                     Body = m.Body,
                     MessageId = m.MessageId,
-                    Position = m.UserId == App.AuthenticatedUser.UserId ? LayoutOptions.Start : LayoutOptions.End,
+                    Position = m.UserId == App.AuthenticatedUser.UserId ? LayoutOptions.End : LayoutOptions.Start,
                     CreatedAt = m.CreatedAt.ToString("t", CultureInfo.CreateSpecificCulture("en-US")),
                     Sent = true
                 });
@@ -78,5 +79,96 @@ namespace xamFixes.Services
             return messages;
 
         }
+
+        public MessageVM CreateMessage(string msg, int userId)
+        {
+            var msgVM = new MessageVM()
+            {
+                Position = App.AuthenticatedUser.UserId == userId ? LayoutOptions.End : LayoutOptions.Start,
+                Body = msg,
+                Sent = true,
+                UserId = userId,
+                CreatedAt = DateTime.Now.ToString("yyyy")
+            };
+            return msgVM;
+        }
+
+        async public Task<ConversationVM> CreateConversation(ConversationVM c)
+        {
+            var db = new InboxRepo();
+
+            var conversationPreview = new ConversationVM();
+            conversationPreview.ConversationId = c.ConversationId;
+            conversationPreview.LastActivity = DateTimeUtils.RelativeTime(DateTime.Parse(c.LastActivity));
+
+            var usersInConv = await db.GetConversationParticipants(c.ConversationId, App.AuthenticatedUser.UserId);
+
+            var recipient = await _profileService.GetUserProfile(usersInConv.FirstOrDefault().UserId);
+            conversationPreview.RecipientUsername = recipient.Username;
+            conversationPreview.RecipientProfilePicturePath = recipient.ProfilePicturePath;
+
+            var lastMsg = await db.GetConversationLastMessage(c.ConversationId);
+            conversationPreview.MessageBody = lastMsg.Body;
+            conversationPreview.Unread = lastMsg.Unread;
+            conversationPreview.Icon = lastMsg.UserId == App.AuthenticatedUser.UserId ? "→" : "←";
+            conversationPreview.FontStyle = lastMsg.Unread ? FontAttributes.Bold : FontAttributes.None;
+
+            return conversationPreview;
+        }
+
+        async public Task<Message> StoreMessage(MessageVM msg, int conversationId, int recipientUserId)
+        {
+            var db = new InboxRepo();
+
+            var message = new Message()
+            {
+                UserId = msg.UserId,
+                Body = msg.Body,
+                ConversationId = conversationId != 0 ? conversationId : 0,
+                CreatedAt = DateTime.Now,
+                Unread = true
+            };
+
+            if (conversationId == 0)
+            {
+
+                var conversation = new Conversation()
+                {
+                    LastActivity = DateTime.Now
+                };
+
+                var convId = await db.SaveConversationAsync(conversation);
+
+                var uic = new UserInConversation()
+                {
+                    ConversationId = convId,
+                    UserId = App.AuthenticatedUser.UserId
+                };
+
+                var uic2 = new UserInConversation()
+                {
+                    ConversationId = convId,
+                    UserId = recipientUserId
+                };
+
+                _ = db.SaveUserInConversationAsync(uic).ConfigureAwait(false);
+                _ = db.SaveUserInConversationAsync(uic2).ConfigureAwait(false);
+
+                message.ConversationId = convId;
+
+            }
+
+            _ = db.SaveMessage(message);
+
+            return message;
+        }
+
+        async public Task<ConversationVM> FindConversation(int userId)
+        {
+            var db = new InboxRepo();
+            var t = await db.FindConversation(userId);
+            return t;
+        }
+
     }
 }

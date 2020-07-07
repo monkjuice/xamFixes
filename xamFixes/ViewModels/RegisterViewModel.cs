@@ -14,7 +14,7 @@ namespace xamFixes.ViewModels
     public class RegisterViewModel : INotifyPropertyChanged
     {
         public Action<string> DisplayError;
-        public Action LoggedIn;
+        public Action Success;
         public event PropertyChangedEventHandler PropertyChanged;
         public ICommand SubmitRegister { protected set; get; }
 
@@ -37,6 +37,7 @@ namespace xamFixes.ViewModels
                 PropertyChanged(this, new PropertyChangedEventArgs("username"));
             }
         }
+
         private string password;
         public string Password
         {
@@ -48,9 +49,20 @@ namespace xamFixes.ViewModels
             }
         }
 
+        private bool isEnabled = true;
+        public bool IsEnabled
+        {
+            get { return isEnabled; }
+            set
+            {
+                isEnabled = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("IsEnabled"));
+            }
+        }
+
         async Task Register()
         {
-
+            IsEnabled = false;
             bool valid = ValidateRegister();
 
             if (!valid)
@@ -64,15 +76,11 @@ namespace xamFixes.ViewModels
             if (await _authService.RegisterAsync(registerForm) == false)
             {
                 DisplayError("Username already in use");
+                IsEnabled = true;
             }
             else
             {
-                var credentials = new AuthUser();
-                credentials.Username = registerForm.Username;
-                credentials.Password = registerForm.Password;
-
-                await _authService.LoginAsync(credentials);
-                LoggedIn();
+                Success();
             }
         }
 
@@ -80,7 +88,7 @@ namespace xamFixes.ViewModels
         {
             if (Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.None)
             {
-                DisplayError("No internet Connection");
+                DisplayError("No internet Connection, please close the application");
                 return false;
             }
 

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using xamFixes.Models;
+using xamFixes.Repository.ViewModel;
+using xamFixes.ViewModels;
 
 namespace xamFixes.Pages.Chat
 {
@@ -17,9 +20,14 @@ namespace xamFixes.Pages.Chat
             InitializeComponent();
         }
 
-        private void ContactTapped(object sender, ItemTappedEventArgs e)
+        async private void ContactTapped(object sender, ItemTappedEventArgs args)
         {
+            User contact = (User)args.Item;
 
+            var conversation = new ConversationVM() { ConversationId = 0, UserId = contact.UserId, RecipientUsername = contact.Username, RecipientProfilePicturePath = contact.ProfilePicturePath };
+
+            if (conversation != null)
+                await Navigation.PushAsync(new Chat.ConversationPage(new ConversationViewModel(conversation)));
         }
     }
 }

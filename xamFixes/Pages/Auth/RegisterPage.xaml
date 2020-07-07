@@ -27,7 +27,7 @@
 
             </StackLayout>
 
-            <Button Command="{Binding SubmitRegister}" Text="Register" TextColor="Black"  
+            <Button IsEnabled="{Binding IsEnabled}" Command="{Binding SubmitRegister}" Text="Register" TextColor="Black"  
                     FontSize="Large" HorizontalOptions="Center" Margin="0,20,0,0" WidthRequest="200"
                     BackgroundColor="White" />
 

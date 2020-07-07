@@ -23,8 +23,8 @@
                 </Button>
             </StackLayout>
 
-            <Frame HasShadow="False" WidthRequest="70" HeightRequest="70" CornerRadius="100" HorizontalOptions="Center" Margin="0,10,0,0">
-                <Image Source="{Binding ProfilePicture}" ></Image>
+            <Frame IsClippedToBounds="True" Padding="0" CornerRadius="100" HasShadow="False" WidthRequest="70" HeightRequest="70" HorizontalOptions="Center" Margin="0,10,0,0">
+                <Image Aspect="AspectFill" Source="{Binding ProfilePicture}" ></Image>
             </Frame>
 
             <Label Text="{Binding Username}" FontAttributes="Bold" TextColor="Black"

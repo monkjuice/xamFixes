@@ -1,7 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Essentials;
@@ -15,16 +19,20 @@ namespace xamFixes.ViewModels
 {
     public class ConversationViewModel : INotifyPropertyChanged
     {
-        private readonly IInboxService _inboxService;
 
         public event PropertyChangedEventHandler PropertyChanged;
+        private HubConnection hubConnection;
 
         void OnPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
+        private readonly IInboxService _inboxService;
+
         ConversationVM _conversation;
+
+        public Command SendMessageCommand { get; }
 
         public ConversationViewModel(ConversationVM conversation)
         {
@@ -34,7 +42,62 @@ namespace xamFixes.ViewModels
 
             recipientName = conversation.RecipientUsername;
 
-            _ = GetLastConversations();
+            _ = GetConversationLastMessages();
+
+            SendMessageCommand = new Command(async () => { await SendMessage(_conversation.RecipientUsername, UnsentBody); });
+
+            _ = ConfigureHub();
+
+        }
+
+        async Task ConfigureHub()
+        {
+            hubConnection = new HubConnectionBuilder()
+                                 .WithUrl($"https://fixesapi-dev.azurewebsites.net/chatHub", options =>
+                                 {
+                                     options.AccessTokenProvider = async () => await Task.FromResult(await SecureStorage.GetAsync("fixes_token"));
+                                 })
+                                 .Build();
+
+            hubConnection.On<string, string>("RecieveMessage", (message, userid) =>
+              {
+
+                  var prettyMsg = _inboxService.CreateMessage(message, int.Parse(userid));
+
+                  Messages.Add(prettyMsg);
+
+              });
+
+            await hubConnection.StartAsync();
+        }
+
+        async Task SendMessage(string who, string message)
+        {
+            EnabledSend = false;
+
+            await hubConnection.InvokeAsync("SendChatMessage", who, message);
+
+            EnabledSend = true;
+
+            var prettyMsg = _inboxService.CreateMessage(message, App.AuthenticatedUser.UserId);
+            var result = await _inboxService.StoreMessage(prettyMsg, _conversation.ConversationId, _conversation.UserId);
+            _conversation.ConversationId = result.ConversationId;
+
+            Messages.Add(prettyMsg);
+
+            UnsentBody = "";
+        }
+
+
+        bool enabledSend = true;
+        public bool EnabledSend
+        {
+            get => enabledSend;
+            set
+            {
+                enabledSend = value;
+                OnPropertyChanged(nameof(EnabledSend));
+            }
         }
 
         string recipientName;
@@ -49,9 +112,23 @@ namespace xamFixes.ViewModels
             }
         }
 
-        List<MessageVM> messages = new List<MessageVM>();
+        string _unsentBody;
+        public string UnsentBody
+        {
+            get
+            {
+                return _unsentBody;
+            }
+            set
+            {
+                _unsentBody = value;
+                OnPropertyChanged(nameof(UnsentBody));
+            }
+        }
 
-        public List<MessageVM> Messages
+        ObservableCollection<MessageVM> messages = new ObservableCollection<MessageVM>();
+
+        public ObservableCollection<MessageVM> Messages
         {
             get => messages;
             set
@@ -61,7 +138,7 @@ namespace xamFixes.ViewModels
             }
         }
 
-        async Task GetLastConversations()
+        async Task GetConversationLastMessages()
         {
             try
             {

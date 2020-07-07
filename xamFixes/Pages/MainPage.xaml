@@ -20,7 +20,11 @@
 
     <local:NewPostPage />
 
-    <local:DiscoverPage />
+    <NavigationPage Title="Discover" IconImageSource="search.png">
+        <x:Arguments>
+            <local:DiscoverPage />
+        </x:Arguments>
+    </NavigationPage>
 
     <NavigationPage Title="Messages" IconImageSource="mail.png">
         <x:Arguments>

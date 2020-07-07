@@ -4,10 +4,13 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             x:Class="xamFixes.Pages.DiscoverPage">
+             x:Class="xamFixes.Pages.SearchPage">
     <ContentPage.Content>
         <StackLayout>
-            <SearchBar x:Name="searchBarInput" Focused="SearchBar_Focused" Placeholder="Search.." VerticalOptions="Start"/>
+            <SearchBar x:Name="searchBarInput" Placeholder="Search.." VerticalOptions="Start"/>
+            <Label Text="Welcome to Xamarin.Forms!"
+                VerticalOptions="CenterAndExpand" 
+                HorizontalOptions="CenterAndExpand" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

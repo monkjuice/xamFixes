@@ -6,7 +6,8 @@
              xmlns:viewModels="clr-namespace:xamFixes.ViewModels"
              xmlns:chatTemplates="clr-namespace:xamFixes.Pages.Chat.Templates"
              mc:Ignorable="d"
-             x:Class="xamFixes.Pages.Chat.NewConversationPage">
+             x:Class="xamFixes.Pages.Chat.NewConversationPage"
+             Title="New Conversation">
 
     <ContentPage.BindingContext>
         <viewModels:NewConversationViewModel/>

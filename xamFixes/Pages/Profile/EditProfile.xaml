@@ -4,28 +4,50 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
+             xmlns:Helpers="clr-namespace:xamFixes.Helpers"
              x:Class="xamFixes.Pages.Profile.EditProfile">
     <ContentPage.Content>
         <StackLayout>
 
             <Button Clicked="MainPage" VerticalOptions="Start" HorizontalOptions="Start" BackgroundColor="Transparent" Text="Cancel"></Button>
             
-            <Button x:Name="ChoosePicture"
+            <Button 
+                IsVisible="{Binding PreviewingPicture, Converter={Helpers:InverseBoolConverter} }"
+                Command="{Binding ChoosePictureCommand}"
                 Text="Choose from library"
-                VerticalOptions="CenterAndExpand" 
+                VerticalOptions="Start" 
                 HorizontalOptions="CenterAndExpand"></Button>
 
-            <Button x:Name="TakePicture" 
+            <Button 
+                IsVisible="{Binding PreviewingPicture, Converter={Helpers:InverseBoolConverter} }"
+                Command="{Binding TakePictureCommand}"
                 Text="Camera"
-                VerticalOptions="CenterAndExpand" 
+                VerticalOptions="Start" 
                 HorizontalOptions="CenterAndExpand"></Button>
 
-            <Image x:Name="ImagePreview"></Image>
-
-            <Button Command="{Binding SubmitCommand}"
-                Text="Upload"
+            <!--<Button 
+                IsVisible="{Binding PreviewingImage}"
+                Command="{Binding SubmitCommand}"
+                Text="Retake"
                 VerticalOptions="CenterAndExpand" 
+                HorizontalOptions="CenterAndExpand"></Button>-->
+
+            <Frame VerticalOptions="Start" HorizontalOptions="Center" IsClippedToBounds="True" Padding="0" CornerRadius="100" HasShadow="False" WidthRequest="70" HeightRequest="70" IsVisible="{Binding PreviewingPicture}">
+                <Image Aspect="AspectFill">
+                    <Image.Source>
+                        <FileImageSource File="{Binding PicturePreview}"></FileImageSource>
+                    </Image.Source>
+                </Image>
+            </Frame>
+
+            <Button 
+                Margin="0,20,0,0"
+                IsVisible="{Binding PreviewingPicture}"
+                Command="{Binding SubmitCommand}"
+                Text="Save"
+                VerticalOptions="Start" 
                 HorizontalOptions="CenterAndExpand"></Button>
+
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

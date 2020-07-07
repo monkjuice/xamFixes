@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-
+using xamFixes.Interfaces;
 using xamFixes.ViewModels;
 
 namespace xamFixes.Pages
@@ -21,7 +21,7 @@ namespace xamFixes.Pages
             var vm = new RegisterViewModel();
             this.BindingContext = vm;
             vm.DisplayError += async (string msg) => await DisplayError(msg);
-            vm.LoggedIn += () => LoggedIn();
+            vm.Success += () => Success();
 
             username.Completed += (object sender, EventArgs e) =>
             {
@@ -41,10 +41,11 @@ namespace xamFixes.Pages
             await DisplayAlert("Error", msg, "OK");
         }
 
-        public void LoggedIn()
+        public void Success()
         {
-            App.IsUserLoggedIn = true;
-            Application.Current.MainPage = new MainPage();
+            DependencyService.Get<IToast>().LongAlert($"Welcome to Fixes {username.Text}, please login to continue!");
+
+            Application.Current.MainPage = new LoginPage();
         }
     }
 }

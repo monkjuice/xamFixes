@@ -12,17 +12,17 @@
                 HorizontalOptions="Center"
                 Orientation="Vertical"
                 VerticalOptions="Center">
-                <Image
-                    HeightRequest="55"
-                    HorizontalOptions="StartAndExpand"
-                    Source="{Binding ProfilePicturePath}"
-                    VerticalOptions="Center"
-                    WidthRequest="55">
-                </Image>
+                <Frame IsClippedToBounds="True" Padding="0" CornerRadius="100" HasShadow="False" WidthRequest="55" HeightRequest="55" HorizontalOptions="Center">
+                    <Image
+                        Aspect="AspectFill"
+                        Source="{Binding ProfilePicturePath}"
+                        >
+                    </Image>
+                </Frame>
             </StackLayout>
 
             <StackLayout
-                Margin="0,0,0,0"
+                Margin="10,0,0,0"
                 HorizontalOptions="FillAndExpand"
                 Orientation="Vertical"
                 VerticalOptions="Center">

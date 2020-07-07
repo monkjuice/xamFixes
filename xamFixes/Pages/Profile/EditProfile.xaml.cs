@@ -21,60 +21,41 @@ namespace xamFixes.Pages.Profile
             InitializeComponent();
             var vm = new EditProfileViewModel();
             this.BindingContext = vm;
+            vm.DisplayError += async (string msg) => await DisplayError(msg);
 
-            TakePicture.Clicked += async (sender, args) =>
-            {
-                await CrossMedia.Current.Initialize();
+            //TakePicture.Clicked += async (sender, args) =>
+            //{
+            //    await CrossMedia.Current.Initialize();
 
-                if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
-                {
-                    await DisplayAlert("No Camera", ":( No camera available.", "OK");
-                    return;
-                }
+            //    if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
+            //    {
+            //        await DisplayAlert("No Camera", ":( No camera available.", "OK");
+            //        return;
+            //    }
 
-                var file = await CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions
-                {
-                    Directory = "Fixes",
-                    Name = DateTime.Now.ToString() + ".jpg"
-                });
+            //    var file = await CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions
+            //    {
+            //        Directory = "Fixes",
+            //        Name = DateTime.Now.ToString() + ".jpg"
+            //    });
 
-                if (file == null)
-                    return;
+            //    if (file == null)
+            //        return;
 
-                await DisplayAlert("File Location", file.Path, "OK");
-               
-                vm.file = file;
+            //    vm.Picture = file;
 
-                ImagePreview.Source = ImageSource.FromStream(() =>
-                {
-                    var stream = file.GetStream();
-                    return stream;
-                });
-            };
+            //    ImagePreview.Source = ImageSource.FromStream(() =>
+            //    {
+            //        var stream = file.GetStream();
+            //        return stream;
+            //    });
+            //};
 
-            ChoosePicture.Clicked += async (sender, args) =>
-            {
-                await CrossMedia.Current.Initialize();
+        }
 
-                if (!CrossMedia.Current.IsPickPhotoSupported)
-                {
-                    await DisplayAlert("No Camera", ":( No camera available.", "OK");
-                    return;
-                }
-
-                var file = await CrossMedia.Current.PickPhotoAsync();
-
-                if (file == null)
-                    return;
-
-                vm.file = file;
-
-                ImagePreview.Source = ImageSource.FromStream(() =>
-                {
-                    var stream = file.GetStream();
-                    return stream;
-                });
-            };
+        public async Task DisplayError(string msg)
+        {
+            await DisplayAlert("Error", msg, "OK");
         }
 
         private void MainPage(object sender, EventArgs e)
