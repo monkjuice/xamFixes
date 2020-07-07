@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using xamFixes.Models;
 using xamFixes.Repository.ORM;
+using xamFixes.DBModel;
 
 namespace xamFixes.Tests
 {
@@ -19,7 +20,7 @@ namespace xamFixes.Tests
             };
 
             var conversations = new List<Conversation>()
-            { 
+            {
                 new Conversation() { LastActivity = DateTime.Now },
                 new Conversation() { LastActivity = DateTime.Now }
             };
@@ -50,8 +51,8 @@ namespace xamFixes.Tests
                 new Message() { UserId = 1, ConversationId = 2, Body = "Indeed", Unread = false },
             };
 
-            try 
-            { 
+            try
+            {
                 // insert Users
                 var userRepo = new UserRepo();
                 foreach (User user in users)
@@ -60,7 +61,7 @@ namespace xamFixes.Tests
                 // insert convos with msgs
                 var inboxRepo = new InboxRepo();
 
-                foreach(var c in conversations)
+                foreach (var c in conversations)
                     await inboxRepo.SaveConversationAsync(c);
 
                 foreach (var uic in userInConv)
@@ -71,7 +72,7 @@ namespace xamFixes.Tests
 
                 return;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }

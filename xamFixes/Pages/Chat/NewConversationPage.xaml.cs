@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using xamFixes.Models;
-using xamFixes.Repository.ViewModel;
 using xamFixes.ViewModels;
 
 namespace xamFixes.Pages.Chat

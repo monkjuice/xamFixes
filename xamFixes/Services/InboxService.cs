@@ -9,8 +9,8 @@ using Xamarin.Forms;
 using xamFixes.Interfaces;
 using xamFixes.Models;
 using xamFixes.Repository.ORM;
-using xamFixes.Repository.ViewModel;
 using xamFixes.Services.Utils;
+using xamFixes.DBModel;
 
 namespace xamFixes.Services
 {

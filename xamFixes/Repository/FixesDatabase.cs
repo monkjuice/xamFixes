@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using xamFixes.Models;
+using xamFixes.DBModel;
 
 namespace xamFixes.Repository
 {
@@ -30,7 +30,7 @@ namespace xamFixes.Repository
         {
             if (!initialized)
             {
-                if (!Database.TableMappings.Any(m => m.MappedType.Name == typeof(User).Name))
+                if (!Database.TableMappings.Any(m => m.MappedType.Name == typeof(Conversation).Name))
                 {
                     await Database.CreateTablesAsync(CreateFlags.None, typeof(Conversation));
                     await Database.CreateTablesAsync(CreateFlags.None, typeof(UserInConversation));
@@ -39,6 +39,11 @@ namespace xamFixes.Repository
                     initialized = true;
                 }
             }
+        }
+        
+        public async Task CloseDatabase()
+        {
+            await Database.CloseAsync();
         }
     }
 }

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace xamFixes.Models
+namespace xamFixes.DBModel
 {
     public class Conversation
     {

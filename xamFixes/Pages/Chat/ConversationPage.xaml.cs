@@ -1,6 +1,5 @@
 ﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using xamFixes.Repository.ViewModel;
 using xamFixes.ViewModels;
 
 namespace xamFixes.Pages.Chat

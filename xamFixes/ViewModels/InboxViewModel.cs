@@ -11,7 +11,6 @@ using Xamarin.Essentials;
 using Xamarin.Forms;
 using xamFixes.Interfaces;
 using xamFixes.Models;
-using xamFixes.Repository.ViewModel;
 using xamFixes.Services;
 
 namespace xamFixes.ViewModels

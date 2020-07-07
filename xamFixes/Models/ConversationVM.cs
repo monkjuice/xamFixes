@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace xamFixes.Repository.ViewModel
+namespace xamFixes.Models
 {
     public class ConversationVM
     {

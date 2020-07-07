@@ -2,7 +2,7 @@
 using System.IO;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using xamFixes.Repository.ViewModel;
+using xamFixes.Models;
 using xamFixes.ViewModels;
 
 namespace xamFixes.Pages

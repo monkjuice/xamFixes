@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using xamFixes.Models;
-using xamFixes.Repository.ViewModel;
+using xamFixes.DBModel;
 
 namespace xamFixes.Repository.ORM
 {

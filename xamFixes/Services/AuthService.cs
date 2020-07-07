@@ -8,12 +8,19 @@ using System.Threading.Tasks;
 using xamFixes.Interfaces;
 using Xamarin.Essentials;
 using xamFixes.Models;
+using xamFixes.Repository;
 
 namespace xamFixes.Services
 {
     public class AuthService : IAuthService
     {
         private readonly HttpClient client = new HttpClient();
+
+        async public Task CloseDatabase()
+        {
+            var db = new FixesDatabase();
+            await db.CloseDatabase();
+        }
 
         public async Task<User> LoginAsync(AuthUser credentials)
         {
