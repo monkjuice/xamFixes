@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text;
+using xamFixes.Models;
 
 namespace xamFixes.ViewModels
 {
@@ -19,14 +20,14 @@ namespace xamFixes.ViewModels
         {
         }
 
-        ObservableCollection<DiscoverSearchResult> posts = new ObservableCollection<DiscoverSearchResult>();
+        ObservableCollection<DiscoverSearchResult> results = new ObservableCollection<DiscoverSearchResult>();
 
         public ObservableCollection<DiscoverSearchResult> Messages
         {
-            get => messages;
+            get => results;
             set
             {
-                messages = value;
+                results = value;
                 OnPropertyChanged(nameof(Messages));
             }
         }
