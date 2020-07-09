@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Xamarin.Essentials;
+using xamFixes.ViewModels;
 
 namespace xamFixes.Pages
 {
@@ -15,6 +16,7 @@ namespace xamFixes.Pages
     {
         public MainPage()
         {
+            Children.Add(new ProfilePage(new ProfileViewModel(App.AuthenticatedUser)));
 
             InitializeComponent();
 

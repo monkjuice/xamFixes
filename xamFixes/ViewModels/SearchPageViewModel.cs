@@ -26,7 +26,7 @@ namespace xamFixes.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public SearchPageViewModel(User user)
+        public SearchPageViewModel()
         {
             SearchUsersCommand = new Command(async () => await SearchUsers());
             _userService = new UserService();
@@ -51,7 +51,6 @@ namespace xamFixes.ViewModels
         }
 
         ObservableCollection<User> users = new ObservableCollection<User>();
-        private User user;
 
         public ObservableCollection<User> Users
         {

@@ -12,9 +12,6 @@
             android:TabbedPage.BarItemColor="#66FFFFFF"
             android:TabbedPage.BarSelectedItemColor="White"
             x:Class="xamFixes.Pages.MainPage">
-  <!--Pages can be added as references or inline-->
-
-    <local:ProfilePage />
 
     <local:HomePage />
 

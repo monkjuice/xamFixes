@@ -7,11 +7,12 @@ using System.Windows.Input;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using xamFixes.Interfaces;
+using xamFixes.Models;
 using xamFixes.Services;
 
 namespace xamFixes.ViewModels
 {
-    class ProfileViewModel : INotifyPropertyChanged
+    public class ProfileViewModel : INotifyPropertyChanged
     {
 
         private readonly IProfileService _profileService;
@@ -25,34 +26,49 @@ namespace xamFixes.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public ProfileViewModel()
+        public ProfileViewModel(User user)
         {
             _profileService = new ProfileService();
 
             LogoutCommand = new Command(Logout);
 
             SetUserProfile();
+
+            Username = user.Username;
+            ProfilePicture = user.ProfilePicturePath;
+            ItsMe = App.AuthenticatedUser.UserId == user.UserId;
         }
 
-        string _username = string.Empty;
-        string _profilePicture = string.Empty;
+        bool itsMe;
+        string username = string.Empty;
+        string profilePicture = string.Empty;
+
+        public bool ItsMe
+        {
+            get => itsMe;
+            set
+            {
+                itsMe = value;
+                OnPropertyChanged(nameof(ItsMe));
+            }
+        }
 
         public string Username
         {
-            get => _username;
+            get => username;
             set
             {
-                _username = value;  
+                username = value;  
                 OnPropertyChanged(nameof(Username));
             }
         }
 
         public string ProfilePicture
         {
-            get => _profilePicture;
+            get => profilePicture;
             set
             {
-                _profilePicture = value;
+                profilePicture = value;
                 OnPropertyChanged(nameof(ProfilePicture));
             }
         }

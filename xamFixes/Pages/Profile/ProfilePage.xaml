@@ -7,7 +7,7 @@
     <ContentPage.Content>
         <StackLayout>
 
-            <StackLayout Orientation="Horizontal" Padding="5,5,5,5">
+            <StackLayout Orientation="Horizontal" Padding="5,5,5,5" IsVisible="{Binding ItsMe}">
                 <Button Command="{Binding LogoutCommand}" 
                     VerticalOptions="Start" HorizontalOptions="Start"
                     BackgroundColor="Transparent" Text="Log Out">

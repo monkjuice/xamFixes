@@ -14,10 +14,9 @@ namespace xamFixes.Pages
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ProfilePage : ContentPage
     {
-        public ProfilePage()
+        public ProfilePage(ProfileViewModel vm)
         {
             InitializeComponent();
-            var vm = new ProfileViewModel();
             this.BindingContext = vm;
             vm.LoggedOut += () => LoggedOut();
         }

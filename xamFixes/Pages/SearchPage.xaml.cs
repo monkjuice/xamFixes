@@ -29,7 +29,7 @@ namespace xamFixes.Pages
         {
             User user = (User)args.Item;
             if (user != null)
-                await Navigation.PushAsync(new Chat.ConversationPage(new SearchPageViewModel(user)));
+                await Navigation.PushAsync(new ProfilePage(new ProfileViewModel(user)));
         }
 
         private void SearchBar_TextChanged(object sender, TextChangedEventArgs e)
