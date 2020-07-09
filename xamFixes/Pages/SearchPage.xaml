@@ -4,13 +4,33 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
+             xmlns:viewModels="clr-namespace:xamFixes.ViewModels"
+             xmlns:templates="clr-namespace:xamFixes.Pages.Templates"
              x:Class="xamFixes.Pages.SearchPage">
+
+    <ContentPage.BindingContext>
+        <viewModels:SearchPageViewModel/>
+    </ContentPage.BindingContext>
+
     <ContentPage.Content>
         <StackLayout>
-            <SearchBar x:Name="searchBarInput" Placeholder="Search.." VerticalOptions="Start"/>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+            <SearchBar SearchCommand="{Binding SearchUsersCommand}" Text="{Binding Username}" x:Name="searchBarInput" Placeholder="Search.." VerticalOptions="Start"/>
+            <ListView
+                        HasUnevenRows="False"
+                        ItemsSource="{Binding Users}"
+                        ItemTapped="UserTapped"
+                        RowHeight="75"
+                        SelectionMode="None"
+                        SeparatorVisibility="Default"
+                        Margin="10,20,0,0">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <templates:UserPreviewCell />
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

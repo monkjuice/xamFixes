@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using xamFixes.Models;
+using xamFixes.ViewModels;
 
 namespace xamFixes.Pages
 {
@@ -20,8 +22,20 @@ namespace xamFixes.Pages
         protected override void OnAppearing()
         {
             base.OnAppearing();
-
             searchBarInput.Focus();
         }
+
+        async private void UserTapped(object sender, ItemTappedEventArgs args)
+        {
+            User user = (User)args.Item;
+            if (user != null)
+                await Navigation.PushAsync(new Chat.ConversationPage(new SearchPageViewModel(user)));
+        }
+
+        private void SearchBar_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
     }
 }

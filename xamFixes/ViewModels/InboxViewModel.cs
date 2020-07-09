@@ -51,8 +51,10 @@ namespace xamFixes.ViewModels
                 var convo = await _inboxService.FindConversation(int.Parse(userid));
 
                 if (convo != null)
-                { 
-                    Conversations.Where(x => x.ConversationId == convo.ConversationId).First().MessageBody = message;
+                {
+                    var conversation = Conversations.Where(x => x.ConversationId == convo.ConversationId).First();
+
+                    conversation.MessageBody = message;
 
                     _ = _inboxService.StoreMessage(_inboxService.CreateMessage(message, int.Parse(userid)), convo.ConversationId, convo.UserId);
                 }
@@ -62,7 +64,7 @@ namespace xamFixes.ViewModels
 
                     convo = await _inboxService.CreateConversation(await _inboxService.FindConversation(int.Parse(userid)));
 
-                    Conversations.Add(await _inboxService.CreateConversation(convo));
+                    Conversations.Insert(0, await _inboxService.CreateConversation(convo));
                 }
             });
         }

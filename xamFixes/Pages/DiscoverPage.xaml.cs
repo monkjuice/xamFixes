@@ -17,12 +17,10 @@ namespace xamFixes.Pages
         public DiscoverPage()
         {
             InitializeComponent();
-
         }
 
         async private void SearchBar_Focused(object sender, FocusEventArgs e)
         {
-
             await Navigation.PushAsync(new SearchPage());
         }
     }

@@ -20,18 +20,6 @@ namespace xamFixes.Pages
             var vm = new ProfileViewModel();
             this.BindingContext = vm;
             vm.LoggedOut += () => LoggedOut();
-
-            try
-            { 
-            var dn = new SeedDummyData();
-
-            //dn.Execute();
-            }
-            catch(Exception e)
-            {
-                throw e;
-            }
-
         }
 
         private void LoggedOut()

@@ -5,9 +5,9 @@ using System.Text;
 
 namespace xamFixes.Repository
 {
-    public static class Constants
+    public class Constants
     {
-        public static string DatabaseFilename = string.Format("{0}.db3", App.AuthenticatedUser.UserId);
+        public string DatabaseFilename = string.Format("{0}.db3", App.AuthenticatedUser != null ? App.AuthenticatedUser.UserId : 0);
 
         public const SQLite.SQLiteOpenFlags Flags =
             // open the database in read/write mode
@@ -20,7 +20,7 @@ namespace xamFixes.Repository
             SQLite.SQLiteOpenFlags.ProtectionCompleteUnlessOpen
             ;
 
-        public static string DatabasePath
+        public string DatabasePath
         {
             get
             {

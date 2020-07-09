@@ -94,7 +94,7 @@ namespace xamFixes.Repository.ORM
         async public Task<List<Message>> GetLastMessagesOfConversation(int conversationId)
         {
             try 
-            { 
+            {
                 var t = await Database.QueryAsync<Message>($@"Select * from Message
                                                                         where ConversationId = {conversationId}
                                                                         order by MessageId asc limit 30;");

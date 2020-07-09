@@ -12,13 +12,14 @@ namespace xamFixes.Repository
 {
     public class FixesDatabase
     {
-        static readonly Lazy<SQLiteAsyncConnection> lazyInitializer = new Lazy<SQLiteAsyncConnection>(() =>
+        readonly Lazy<SQLiteAsyncConnection> lazyInitializer = new Lazy<SQLiteAsyncConnection>(() =>
         {
             //File.Delete($"/data/user/0/com.companyname.xamfixes/files/.local/share/{App.AuthenticatedUser.UserId}.db3");
-            return new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
+            var constants = new Constants();
+            return new SQLiteAsyncConnection(constants.DatabasePath, Constants.Flags);
         });
 
-        public static SQLiteAsyncConnection Database => lazyInitializer.Value;
+        public SQLiteAsyncConnection Database => lazyInitializer.Value;
         static bool initialized = false;
 
         public FixesDatabase()
@@ -41,9 +42,5 @@ namespace xamFixes.Repository
             }
         }
         
-        public async Task CloseDatabase()
-        {
-            await Database.CloseAsync();
-        }
     }
 }

@@ -10,8 +10,7 @@
             <StackLayout Orientation="Horizontal" Padding="5,5,5,5">
                 <Button Command="{Binding LogoutCommand}" 
                     VerticalOptions="Start" HorizontalOptions="Start"
-                    BackgroundColor="Transparent" Text="Log Out"
-                    >
+                    BackgroundColor="Transparent" Text="Log Out">
                 </Button>
 
                 <Button Clicked="EditProfile_Clicked"
@@ -24,7 +23,15 @@
             </StackLayout>
 
             <Frame IsClippedToBounds="True" Padding="0" CornerRadius="100" HasShadow="False" WidthRequest="70" HeightRequest="70" HorizontalOptions="Center" Margin="0,10,0,0">
-                <Image Aspect="AspectFill" Source="{Binding ProfilePicture}" ></Image>
+                <Image Aspect="AspectFill" 
+                       HorizontalOptions="CenterAndExpand"
+	                   VerticalOptions ="CenterAndExpand">
+                    <Image.Source>
+                        <UriImageSource Uri="{Binding ProfilePicture}" 
+			                            CacheValidity="14" 
+			                            CachingEnabled="true"/>
+                    </Image.Source>
+                </Image>
             </Frame>
 
             <Label Text="{Binding Username}" FontAttributes="Bold" TextColor="Black"

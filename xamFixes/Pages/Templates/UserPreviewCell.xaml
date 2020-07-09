@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="xamFixes.Pages.Templates.UserPreviewCell">
+    <ContentView.Content>
+        <StackLayout Orientation="Horizontal" Padding="0,10,0,10">
+
+            <StackLayout
+                HorizontalOptions="Center"
+                Orientation="Vertical"
+                VerticalOptions="Center">
+                <Frame IsClippedToBounds="True" Padding="0" CornerRadius="100" HasShadow="False" WidthRequest="55" HeightRequest="55" HorizontalOptions="Center">
+                    <Image
+                        Aspect="AspectFill"
+                        Source="{Binding ProfilePicturePath}"
+                        >
+                    </Image>
+                </Frame>
+            </StackLayout>
+
+            <StackLayout
+                Margin="10,0,0,0"
+                HorizontalOptions="FillAndExpand"
+                Orientation="Vertical"
+                VerticalOptions="Center">
+                <StackLayout  
+                    Margin="0,0,0,1"
+                    HorizontalOptions="FillAndExpand"
+                    Orientation="Horizontal"
+                    VerticalOptions="Center">
+                    <Label
+                        Text="{Binding Username}"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" 
+                        TextColor="Black"
+                        FontAttributes="Bold"/>
+                </StackLayout>
+            </StackLayout>
+
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>
