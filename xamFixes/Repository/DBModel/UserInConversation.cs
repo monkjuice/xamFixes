@@ -10,7 +10,7 @@ namespace xamFixes.DBModel
         [PrimaryKey, AutoIncrement]
         public int UserInConversationId { get; set; }
 
-        public int ConversationId { get; set; }
+        public Guid ConversationId { get; set; }
 
         public int UserId { get; set; }
     }

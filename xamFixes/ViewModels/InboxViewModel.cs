@@ -9,9 +9,11 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using xamFixes.Crypto;
 using xamFixes.Interfaces;
 using xamFixes.Models;
 using xamFixes.Services;
+using xamFixes.Services.Utils;
 
 namespace xamFixes.ViewModels
 {
@@ -19,6 +21,8 @@ namespace xamFixes.ViewModels
     {
 
         private readonly IInboxService _inboxService;
+        private readonly IProfileService _profileService;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         void OnPropertyChanged(string name)
@@ -29,6 +33,7 @@ namespace xamFixes.ViewModels
         public InboxViewModel()
         {
             _inboxService = new InboxService();
+            _profileService = new ProfileService();
 
             _ = ConfigureHub();
 
@@ -46,27 +51,68 @@ namespace xamFixes.ViewModels
 
             await hubConnection.StartAsync();
 
-            hubConnection.On<string, string>("RecieveMessage", async (message, userid) =>
+            hubConnection.On<byte[], string>("RecieveMessage", async (message, userid) =>
             {
-                var convo = await _inboxService.FindConversation(int.Parse(userid));
+                try 
+                { 
+                    var convo = await _inboxService.FindConversation(int.Parse(userid));
 
-                if (convo != null)
-                {
-                    var conversation = Conversations.Where(x => x.ConversationId == convo.ConversationId).First();
+                    var user = await _profileService.GetUserProfile(int.Parse(userid));
 
-                    conversation.MessageBody = message;
+                    if (convo == null)
+                        return;
 
-                    _ = _inboxService.StoreMessage(_inboxService.CreateMessage(message, int.Parse(userid)), convo.ConversationId, convo.UserId);
+                    string decrypted = Crypto.FixesCrypto.DecryptData(await SecureStorage.GetAsync(convo.ConversationId.ToString()), message);
+
+                    var listViewConversation = Conversations.Where(x => x.ConversationId == convo.ConversationId).FirstOrDefault();
+
+                    if (listViewConversation == null)
+                    {
+                        convo.MessageBody = decrypted;
+                        Conversations.Add(convo);
+                    }
+                    else
+                    {
+                        listViewConversation.MessageBody = decrypted;
+                    }
+
+
+                    _ = _inboxService.StoreMessage(_inboxService.CreateMessage(decrypted, int.Parse(userid)), convo.ConversationId, convo.UserId);
                 }
-                else
+                catch(Exception e)
                 {
-                    _ =  _inboxService.StoreMessage(_inboxService.CreateMessage(message, int.Parse(userid)), 0, int.Parse(userid));
-
-                    convo = await _inboxService.CreateConversation(await _inboxService.FindConversation(int.Parse(userid)));
-
-                    Conversations.Insert(0, await _inboxService.CreateConversation(convo));
+                    return;
                 }
             });
+
+            hubConnection.On<string, string>("RecieveHandshake", async (publickey, who) =>
+            {
+
+                var conversation = await _inboxService.FindConversation(int.Parse(who));
+
+                if (conversation == null)
+                    conversation = await _inboxService.StoreConversation(int.Parse(who));
+
+                var user = await _profileService.GetUserProfile(int.Parse(who));
+
+                // mine
+                KeyPair keypair = FixesCrypto.GenerateKeyPair();
+                await SecureStorage.SetAsync(conversation.ConversationId.ToString(), keypair.PrivateKey);
+
+                // RespondHandshake
+                await hubConnection.InvokeAsync("RespondHandshake", user.Username, keypair.PublicKey);
+
+                // theirs
+                await SecureStorage.SetAsync(Base64Encoder.Base64Encode(user.Username), publickey);
+            });
+
+            hubConnection.On<string, string>("HandshakeResponse", async (publickey, who) =>
+            {
+                var user = await _profileService.GetUserProfile(int.Parse(who));
+
+                await SecureStorage.SetAsync(Base64Encoder.Base64Encode(user.Username), publickey);
+            });
+
         }
 
         ObservableCollection<ConversationVM> conversations = new ObservableCollection<ConversationVM>();

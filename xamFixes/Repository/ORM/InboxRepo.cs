@@ -5,23 +5,36 @@ using System.Text;
 using System.Threading.Tasks;
 using xamFixes.Models;
 using xamFixes.DBModel;
+using System.Diagnostics;
 
 namespace xamFixes.Repository.ORM
 {
     public class InboxRepo : FixesDatabase
     {
 
-        async public Task<int> SaveConversationAsync(Conversation conversation)
+        async public Task<Guid> SaveConversationAsync(Conversation conversation)
         {
-            if (conversation.ConversationId != 0)
-            {
-                return await Database.UpdateAsync(conversation);
-            }
-            else
-            {
-                var t = await Database.InsertAsync(conversation);
+
+            try
+            { 
+                if (await GetConversation(conversation.ConversationId) != null)
+                {
+                    _ = await Database.UpdateAsync(conversation);
+                }
+                else
+                {
+                    var t = await Database.InsertAsync(conversation);
+                }
+
+                var c = await GetLastConversations();
+
                 return conversation.ConversationId;
             }
+            catch(Exception e)
+            {
+                return Guid.Empty;
+            }
+
         }
 
         public Task<int> SaveUserInConversationAsync(UserInConversation uic)
@@ -41,7 +54,7 @@ namespace xamFixes.Repository.ORM
             }
         }
 
-        async public Task<List<Conversation>> GetLastConversations(int userId)
+        async public Task<List<Conversation>> GetLastConversations()
         {
             try
             {
@@ -61,12 +74,16 @@ namespace xamFixes.Repository.ORM
         /// <param name="conversationId"></param>
         /// <param name="userId">Logged in user id</param>
         /// <returns>List of UserInConversation</returns>
-        async public Task<List<UserInConversation>> GetConversationParticipants(int conversationId, int userId)
+        async public Task<List<UserInConversation>> GetConversationParticipants(Guid conversationId, int userId)
         {
             try
             {
+
+                Database.Tracer = new Action<string>(q => Debug.WriteLine(q));
+                Database.Trace = true;
+
                 var usersInConv = await Database.QueryAsync<UserInConversation>($@"Select * from UserInConversation uc
-                    where uc.ConversationId = {conversationId} and uc.UserId is not {userId};");
+                    where uc.ConversationId = '" + conversationId.ToString() + $"' and uc.UserId is not {userId};");
 
                 return usersInConv;
             }
@@ -76,12 +93,12 @@ namespace xamFixes.Repository.ORM
             }
         }
 
-        async public Task<Message> GetConversationLastMessage(int conversationId)
+        async public Task<Message> GetConversationLastMessage(Guid conversationId)
         {
             try
             {
                 var msg = await Database.QueryAsync<Message>($@"Select * from Message m
-                    where m.ConversationId = {conversationId} order by m.MessageId desc limit 1;");
+                    where m.ConversationId = '{conversationId}' order by m.MessageId desc limit 1;");
 
                 return msg.FirstOrDefault();
             }
@@ -91,12 +108,12 @@ namespace xamFixes.Repository.ORM
             }
         }
 
-        async public Task<List<Message>> GetLastMessagesOfConversation(int conversationId)
+        async public Task<List<Message>> GetLastMessagesOfConversation(Guid conversationId)
         {
             try 
             {
                 var t = await Database.QueryAsync<Message>($@"Select * from Message
-                                                                        where ConversationId = {conversationId}
+                                                                        where ConversationId = '{conversationId}'
                                                                         order by MessageId asc limit 30;");
                 return t;
             }
@@ -104,6 +121,13 @@ namespace xamFixes.Repository.ORM
             {
                 throw e;
             }
+        }
+
+        async Task<ConversationVM> GetConversation(Guid conversationId)
+        {
+            var t = await Database.QueryAsync<ConversationVM>("Select * from Conversation where ConversationId = '" + conversationId.ToString() + "';");
+
+            return t.FirstOrDefault();
         }
 
         async public Task<ConversationVM> FindConversation(int userId)

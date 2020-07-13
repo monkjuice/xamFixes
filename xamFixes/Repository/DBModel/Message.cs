@@ -10,7 +10,7 @@ namespace xamFixes.DBModel
         [PrimaryKey, AutoIncrement]
         public int MessageId { get; set; }
 
-        public int ConversationId { get; set; }
+        public Guid ConversationId { get; set; }
 
         public string Body { get; set; }
 

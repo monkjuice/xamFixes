@@ -23,7 +23,7 @@ namespace xamFixes.Pages.Chat
         {
             User contact = (User)args.Item;
 
-            var conversation = new ConversationVM() { ConversationId = 0, UserId = contact.UserId, RecipientUsername = contact.Username, RecipientProfilePicturePath = contact.ProfilePicturePath };
+            var conversation = new ConversationVM() { ConversationId = Guid.Empty, UserId = contact.UserId, RecipientUsername = contact.Username, RecipientProfilePicturePath = contact.ProfilePicturePath };
 
             if (conversation != null)
                 await Navigation.PushAsync(new Chat.ConversationPage(new ConversationViewModel(conversation)));

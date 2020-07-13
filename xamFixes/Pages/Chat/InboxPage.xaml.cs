@@ -17,8 +17,8 @@ namespace xamFixes.Pages
 
         private void LoadTestMessages(object sender, EventArgs e)
         {
-            var t = new xamFixes.Tests.SeedDummyData();
-            t.Execute();
+            //var t = new xamFixes.Tests.SeedDummyData();
+            //t.Execute();
         }
 
         private void CopyDatabase(object sender, EventArgs e)

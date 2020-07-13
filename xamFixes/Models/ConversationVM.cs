@@ -6,9 +6,7 @@ namespace xamFixes.Models
 {
     public class ConversationVM
     {
-        public int MessageId { get; set; }
-
-        public int ConversationId { get; set; }
+        public Guid ConversationId { get; set; }
 
         public string MessageBody { get; set; }
 
@@ -19,10 +17,6 @@ namespace xamFixes.Models
         public Xamarin.Forms.FontAttributes FontStyle { get; set; }
 
         public int UserId { get; set; }
-
-        public string Username { get; set; }
-
-        public string ProfilePicturePath { get; set; }
 
         public string RecipientUsername { get; set; }
 

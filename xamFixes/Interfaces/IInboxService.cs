@@ -13,10 +13,12 @@ namespace xamFixes.Interfaces
     public interface IInboxService
     {
         Task<ObservableCollection<ConversationVM>> GetLastConversations(int userId);
-        Task<ObservableCollection<MessageVM>> GetConversationLastMessages(int userId);
+        Task<ObservableCollection<MessageVM>> GetConversationLastMessages(Guid conversationId);
         MessageVM CreateMessage(string msg, int userId);
-        Task<Message> StoreMessage(MessageVM msg, int conversationId, int recipientUserId);
+        Task<Message> StoreMessage(MessageVM msg, Guid conversationId, int recipientUserId);
         Task<ConversationVM> FindConversation(int userId);
         Task<ConversationVM> CreateConversation(ConversationVM convo);
+        Task<ConversationVM> ResumeOrStartConversation(int userId, string username, string profilePicture);
+        Task<ConversationVM> StoreConversation(int userid);
     }
 }

@@ -14,12 +14,15 @@ namespace xamFixes.ViewModels
 {
     public class ProfileViewModel : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly IProfileService _profileService;
-        public event PropertyChangedEventHandler PropertyChanged;
+        private readonly IInboxService _inboxService;
         public ICommand LogoutCommand { protected set; get; }
-        public Action LoggedOut;
+        public ICommand SendMessageCommand { protected set; get; }
 
+        public Action LoggedOut;
+        public Action GoToConversation;
 
         void OnPropertyChanged(string name)
         {
@@ -29,17 +32,16 @@ namespace xamFixes.ViewModels
         public ProfileViewModel(User user)
         {
             _profileService = new ProfileService();
+            _inboxService = new InboxService();
 
             LogoutCommand = new Command(Logout);
+            SendMessageCommand = new Command(ResumeOrStartConversation);
 
-            SetUserProfile();
-
-            Username = user.Username;
-            ProfilePicture = user.ProfilePicturePath;
-            ItsMe = App.AuthenticatedUser.UserId == user.UserId;
+            SetUserProfile(user);
         }
 
         bool itsMe;
+        int userId;
         string username = string.Empty;
         string profilePicture = string.Empty;
 
@@ -50,6 +52,16 @@ namespace xamFixes.ViewModels
             {
                 itsMe = value;
                 OnPropertyChanged(nameof(ItsMe));
+            }
+        }
+
+        public int UserId
+        {
+            get => userId;
+            set
+            {
+                userId = value;
+                OnPropertyChanged(nameof(UserId));
             }
         }
 
@@ -73,10 +85,21 @@ namespace xamFixes.ViewModels
             }
         }
 
-        void SetUserProfile()
+        public ConversationVM Conversation { get; set; }
+
+        void SetUserProfile(User user)
         {
-            Username = App.AuthenticatedUser.Username;
-            ProfilePicture = App.AuthenticatedUser.ProfilePicturePath;
+            UserId = user.UserId;
+            Username = user.Username;
+            ProfilePicture = user.ProfilePicturePath;
+            ItsMe = App.AuthenticatedUser.UserId == user.UserId;
+        }
+
+        async void ResumeOrStartConversation()
+        {
+            Conversation = await _inboxService.ResumeOrStartConversation(UserId, Username, ProfilePicture);
+
+            GoToConversation();
         }
 
         void Logout()

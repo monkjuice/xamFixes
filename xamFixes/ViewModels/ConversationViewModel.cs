@@ -10,9 +10,12 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Essentials;
 using Xamarin.Forms;
+using xamFixes.Crypto;
+using xamFixes.DBModel;
 using xamFixes.Interfaces;
 using xamFixes.Models;
 using xamFixes.Services;
+using xamFixes.Services.Utils;
 
 namespace xamFixes.ViewModels
 {
@@ -28,6 +31,8 @@ namespace xamFixes.ViewModels
         }
 
         private readonly IInboxService _inboxService;
+        private readonly IProfileService _profileService;
+
 
         ConversationVM _conversation;
 
@@ -36,6 +41,7 @@ namespace xamFixes.ViewModels
         public ConversationViewModel(ConversationVM conversation)
         {
             _inboxService = new InboxService();
+            _profileService = new ProfileService();
 
             _conversation = conversation;
 
@@ -57,34 +63,114 @@ namespace xamFixes.ViewModels
                                      options.AccessTokenProvider = async () => await Task.FromResult(await SecureStorage.GetAsync("fixes_token"));
                                  })
                                  .Build();
-
-            hubConnection.On<string, string>("RecieveMessage", (message, userid) =>
-              {
-
-                  var prettyMsg = _inboxService.CreateMessage(message, int.Parse(userid));
-
-                  Messages.Add(prettyMsg);
-
-              });
-
             await hubConnection.StartAsync();
+
+            await SendHandshake(_conversation.UserId);
+
+            RecieveMessage();
+
+            await PersistHandshakeResponse();
         }
+
+        async Task SendHandshake(int who)
+        {
+            try 
+            {
+                EstablishingConnection = true;
+
+                KeyPair keypair = FixesCrypto.GenerateKeyPair();
+
+                if(_conversation.ConversationId == Guid.Empty)
+                    _conversation = await _inboxService.StoreConversation(who);
+
+                _conversation.ConversationId = _conversation.ConversationId;
+
+                await SecureStorage.SetAsync(_conversation.ConversationId.ToString(), keypair.PrivateKey);
+
+                await hubConnection.InvokeAsync("SendHandshake", _conversation.RecipientUsername, keypair.PublicKey);
+
+                if (await SuccessfulHandshake(_conversation.RecipientUsername))
+                {
+                    ConnectionEstablished = true;
+                    EstablishingConnection = false;
+                }
+            }
+            catch(Exception e)
+            {
+                return;
+            }
+        }
+
+        void RecieveMessage()
+        {
+            hubConnection.On<byte[], string>("RecieveMessage", async (message, userid) =>
+            {
+
+                string decrypted = Crypto.FixesCrypto.DecryptData(await SecureStorage.GetAsync(_conversation.ConversationId.ToString()), message);
+
+                var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid));
+
+                Messages.Add(prettyMsg);
+            });
+        }
+
+        public bool EstablishingConnection { get; set; }
+
+        public bool ConnectionEstablished { get; set; }
+
+        async public Task<bool> SuccessfulHandshake(string who, int tries = 0)
+        {
+            if (tries > 4)
+                return false;
+
+            var exists = await SecureStorage.GetAsync(Base64Encoder.Base64Encode(who));
+
+            if(exists != null)
+                return true;
+            else
+            {
+                Thread.Sleep(400);
+                return await SuccessfulHandshake(who, tries += 1);
+            }
+                
+        }
+
+        public string publicKey { get; set; }
 
         async Task SendMessage(string who, string message)
         {
             EnabledSend = false;
 
-            await hubConnection.InvokeAsync("SendChatMessage", who, message);
+            byte[] encryptedMsg =  Crypto.FixesCrypto.EncryptText(await SecureStorage.GetAsync(Base64Encoder.Base64Encode(recipientName)), message);
 
-            EnabledSend = true;
+            try 
+            { 
+                await hubConnection.InvokeAsync("SendChatMessage", who, encryptedMsg);
 
-            var prettyMsg = _inboxService.CreateMessage(message, App.AuthenticatedUser.UserId);
-            var result = await _inboxService.StoreMessage(prettyMsg, _conversation.ConversationId, _conversation.UserId);
-            _conversation.ConversationId = result.ConversationId;
+                EnabledSend = true;
 
-            Messages.Add(prettyMsg);
+                var prettyMsg = _inboxService.CreateMessage(message, App.AuthenticatedUser.UserId);
+                var result = await _inboxService.StoreMessage(prettyMsg, _conversation.ConversationId, _conversation.UserId);
 
-            UnsentBody = "";
+                Messages.Add(prettyMsg);
+
+                UnsentBody = "";
+            }
+            catch(Exception e)
+            {
+                EnabledSend = true;
+                return;
+            }
+        }
+
+        async Task PersistHandshakeResponse()
+        {
+            hubConnection.On<string, string>("HandshakeResponse", async (publickey, who) =>
+            {
+                var user = await _profileService.GetUserProfile(int.Parse(who));
+
+                await SecureStorage.SetAsync(Base64Encoder.Base64Encode(user.Username), publickey);
+            });
         }
 
 

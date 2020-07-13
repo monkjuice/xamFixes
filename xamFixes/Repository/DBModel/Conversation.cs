@@ -7,8 +7,8 @@ namespace xamFixes.DBModel
 {
     public class Conversation
     {
-        [PrimaryKey, AutoIncrement]
-        public int ConversationId { get; set; }
+        [PrimaryKey]
+        public Guid ConversationId { get; set; }
 
         public DateTime LastActivity { get; set; }
 
