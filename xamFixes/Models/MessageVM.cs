@@ -6,7 +6,7 @@ namespace xamFixes.Models
 {
     public class MessageVM
     {
-        public int MessageId { get; set; }
+        public Guid MessageId { get; set; }
 
         public Xamarin.Forms.LayoutOptions Position { get; set; }
 

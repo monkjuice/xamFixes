@@ -71,7 +71,11 @@ namespace xamFixes.ViewModels
 
                     listViewConversation.MessageBody = decrypted;
 
-                    _ = _inboxService.StoreMessage(_inboxService.CreateMessage(decrypted, int.Parse(userid)), convo.ConversationId, convo.UserId);
+                    var messageId = Guid.NewGuid();
+
+                    var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid), messageId);
+
+                    _ = _inboxService.StoreMessage(prettyMsg, convo.ConversationId, convo.UserId);
                 }
                 catch(Exception e)
                 {

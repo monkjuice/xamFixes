@@ -26,8 +26,6 @@ namespace xamFixes.Repository.ORM
                     var t = await Database.InsertAsync(conversation);
                 }
 
-                var c = await GetLastConversations();
-
                 return conversation.ConversationId;
             }
             catch(Exception e)

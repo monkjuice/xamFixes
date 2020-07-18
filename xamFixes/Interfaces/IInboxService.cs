@@ -14,7 +14,7 @@ namespace xamFixes.Interfaces
     {
         Task<ObservableCollection<ConversationVM>> GetLastConversations(int userId);
         Task<ObservableCollection<MessageVM>> GetConversationLastMessages(Guid conversationId);
-        MessageVM CreateMessage(string msg, int userId);
+        MessageVM CreateMessage(string msg, int userId, Guid messageId);
         Task<Message> StoreMessage(MessageVM msg, Guid conversationId, int recipientUserId);
         Task<ConversationVM> FindConversation(int userId);
         Task<ConversationVM> CreateConversation(ConversationVM convo);

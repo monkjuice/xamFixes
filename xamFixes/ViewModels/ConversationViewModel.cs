@@ -119,7 +119,11 @@ namespace xamFixes.ViewModels
             {
                 string decrypted = Crypto.FixesCrypto.DecryptData(await SecureStorage.GetAsync(_conversation.ConversationId.ToString()), message);
 
-                var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid));
+
+                // TODO: RECIEVE JSON MESSAGE... GRAB MESSAGE ID
+                var messageId = Guid.Empty;
+
+                var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid), messageId);
 
                 Messages.Add(prettyMsg);
 
@@ -157,7 +161,7 @@ namespace xamFixes.ViewModels
 
                 EnabledSend = true;
 
-                var prettyMsg = _inboxService.CreateMessage(message, App.AuthenticatedUser.UserId);
+                var prettyMsg = _inboxService.CreateMessage(message, App.AuthenticatedUser.UserId, Guid.Empty);
                 var result = await _inboxService.StoreMessage(prettyMsg, _conversation.ConversationId, _conversation.UserId);
 
                 Messages.Add(prettyMsg);

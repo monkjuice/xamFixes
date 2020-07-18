@@ -110,10 +110,11 @@ namespace xamFixes.Services
 
         }
 
-        public MessageVM CreateMessage(string msg, int userId)
+        public MessageVM CreateMessage(string msg, int userId, Guid messageId)
         {
             var msgVM = new MessageVM()
             {
+                MessageId = messageId,
                 Position = App.AuthenticatedUser.UserId == userId ? LayoutOptions.End : LayoutOptions.Start,
                 Body = msg,
                 Sent = true,
@@ -153,6 +154,7 @@ namespace xamFixes.Services
 
             var message = new Message()
             {
+                MessageId = msg.MessageId,
                 UserId = msg.UserId,
                 Body = msg.Body,
                 ConversationId = conversationId != Guid.Empty ? conversationId : Guid.Empty,
