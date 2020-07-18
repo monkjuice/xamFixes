@@ -52,7 +52,7 @@ namespace xamFixes.Services
             }
         }
 
-        async public Task<bool> UploadProfilePicture(MediaFile picture)
+        async public Task<string> UploadProfilePicture(MediaFile picture)
         {
             try
             {
@@ -73,23 +73,25 @@ namespace xamFixes.Services
                 var task = await client.PostAsync(Base.baseURL + "/api/user/uploadprofilepicture", content);
 
                 if (!task.IsSuccessStatusCode)
-                    return false;
+                    return null;
                 
                 var jsonString = task.Content.ReadAsStringAsync().Result.Replace("\\", "").Trim('"');
 
                 var response = JsonConvert.DeserializeObject<Base.Response>(jsonString);
 
                 if (response.Error == true)
-                    return false;
+                    return null;
 
                 picture.Dispose();
 
-                return true;
+                var path = response.Message["path"];
+
+                return response.Message["path"].ToString();
 
             }
             catch (Exception e)
             {
-                return false;
+                return null;
             }
         }
     }

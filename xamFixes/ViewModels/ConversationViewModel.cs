@@ -24,6 +24,7 @@ namespace xamFixes.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
         private HubConnection hubConnection;
+        public Action ScrollToBottom;
 
         void OnPropertyChanged(string name)
         {
@@ -69,14 +70,26 @@ namespace xamFixes.ViewModels
 
             RecieveMessage();
 
-            await PersistHandshakeResponse();
+            PersistHandshakeResponse();
+        }
+
+
+        bool connectionEstablished = false;
+
+        public bool ConnectionEstablished
+        {
+            get => connectionEstablished;
+            set
+            {
+                connectionEstablished = value; EnabledSend = value;
+                OnPropertyChanged(nameof(ConnectionEstablished));
+            }
         }
 
         async Task SendHandshake(int who)
         {
             try 
             {
-                EstablishingConnection = true;
 
                 KeyPair keypair = FixesCrypto.GenerateKeyPair();
 
@@ -92,7 +105,6 @@ namespace xamFixes.ViewModels
                 if (await SuccessfulHandshake(_conversation.RecipientUsername))
                 {
                     ConnectionEstablished = true;
-                    EstablishingConnection = false;
                 }
             }
             catch(Exception e)
@@ -105,22 +117,19 @@ namespace xamFixes.ViewModels
         {
             hubConnection.On<byte[], string>("RecieveMessage", async (message, userid) =>
             {
-
                 string decrypted = Crypto.FixesCrypto.DecryptData(await SecureStorage.GetAsync(_conversation.ConversationId.ToString()), message);
 
                 var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid));
 
                 Messages.Add(prettyMsg);
+
+                ScrollToBottom();
             });
         }
 
-        public bool EstablishingConnection { get; set; }
-
-        public bool ConnectionEstablished { get; set; }
-
         async public Task<bool> SuccessfulHandshake(string who, int tries = 0)
         {
-            if (tries > 4)
+            if (tries > 20)
                 return false;
 
             var exists = await SecureStorage.GetAsync(Base64Encoder.Base64Encode(who));
@@ -129,10 +138,9 @@ namespace xamFixes.ViewModels
                 return true;
             else
             {
-                Thread.Sleep(400);
+                Thread.Sleep(tries * 100);
                 return await SuccessfulHandshake(who, tries += 1);
             }
-                
         }
 
         public string publicKey { get; set; }
@@ -154,6 +162,8 @@ namespace xamFixes.ViewModels
 
                 Messages.Add(prettyMsg);
 
+                ScrollToBottom();
+
                 UnsentBody = "";
             }
             catch(Exception e)
@@ -163,13 +173,15 @@ namespace xamFixes.ViewModels
             }
         }
 
-        async Task PersistHandshakeResponse()
+        void PersistHandshakeResponse()
         {
             hubConnection.On<string, string>("HandshakeResponse", async (publickey, who) =>
             {
                 var user = await _profileService.GetUserProfile(int.Parse(who));
 
                 await SecureStorage.SetAsync(Base64Encoder.Base64Encode(user.Username), publickey);
+
+                ConnectionEstablished = true;
             });
         }
 
@@ -222,7 +234,7 @@ namespace xamFixes.ViewModels
                 OnPropertyChanged(nameof(Messages));
             }
         }
-
+        
         async Task GetConversationLastMessages()
         {
             try

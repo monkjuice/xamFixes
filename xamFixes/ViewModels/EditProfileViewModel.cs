@@ -17,7 +17,10 @@ namespace xamFixes.ViewModels
     class EditProfileViewModel : INotifyPropertyChanged
     {
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public Action<string> DisplayError;
+        public Action MainPage;
 
         private readonly IProfileService _profileService;
         public ICommand SubmitCommand { protected set; get; }
@@ -38,9 +41,8 @@ namespace xamFixes.ViewModels
             _profileService = new ProfileService();
         }
 
-        private bool previewingPicture = false;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        private bool previewingPicture = false;
 
         public bool PreviewingPicture
         {
@@ -63,10 +65,55 @@ namespace xamFixes.ViewModels
             }
         }
 
+        private string buttonColor = "White";
+
+        public string ButtonColor
+        {
+            get { return buttonColor; }
+            set
+            {
+                buttonColor = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("ButtonColor"));
+            }
+        }
+
+        private bool enabledUpload = true;
+        public bool EnabledUpload
+        {
+            get { return enabledUpload; }
+            set
+            {
+                enabledUpload = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("EnabledUpload"));
+            }
+        }
+
         async Task UploadProfilePicture()
         {
-            var success = await _profileService.UploadProfilePicture(Picture);
-            return;
+            EnabledUpload = false;
+            ButtonColor = "LightGray";
+
+            try 
+            { 
+                var path = await _profileService.UploadProfilePicture(Picture);
+
+                if (path != null)
+                { 
+                    App.AuthenticatedUser.ProfilePicturePath = path;
+                    MainPage();
+                }
+                else
+                    DisplayError("Error uploading image, please try again later");
+            }
+            catch(Exception e)
+            {
+
+            }
+            finally
+            {
+                EnabledUpload = true;
+                ButtonColor = "White";
+            }
         }
 
         async Task TakePicture()

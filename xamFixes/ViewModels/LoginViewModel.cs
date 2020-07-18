@@ -25,6 +25,7 @@ namespace xamFixes.ViewModels
         {
             SubmitCommand = new Command(async () => await AttemptLogin());
             _authService = new AuthService();
+            enabledLogin = true;
         }
 
         private string username;
@@ -48,30 +49,77 @@ namespace xamFixes.ViewModels
             }
         }
 
+        private bool enabledLogin;
+        public bool EnabledLogin
+        {
+            get { return enabledLogin; }
+            set
+            {
+                enabledLogin = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("EnabledLogin"));
+            }
+        }
+
+        private string buttonColor = "White";
+        public string ButtonColor
+        {
+            get { return buttonColor; }
+            set
+            {
+                buttonColor = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("ButtonColor"));
+            }
+        }
+
+        private string loginButtonText = "Login";
+        public string LoginButtonText
+        {
+            get { return loginButtonText; }
+            set
+            {
+                loginButtonText = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("LoginButtonText"));
+            }
+        }
+
         async Task AttemptLogin()
         {
+            try
+            { 
 
-            bool valid = ValidateAttemptLogin();
+                ButtonColor = "LightGray";
+                LoginButtonText = "Loading..";
+                EnabledLogin = false;
+                bool valid = ValidateAttemptLogin();
 
-            if (!valid)
-                return;
+                if (!valid)
+                    DisplayError("Invalid username/password");
 
-            var credentials = new AuthUser();
+                var credentials = new AuthUser();
+                credentials.Username = username;
+                credentials.Password = password;
 
-            credentials.Username = username;
-            credentials.Password = password;
-
-            var user = await _authService.LoginAsync(credentials);
-            if (user == null)
-            {
-                DisplayError("Invalid username/password");
+                var user = await _authService.LoginAsync(credentials);
+                if (user == null)
+                {
+                    DisplayError("Invalid username/password");
+                }
+                else
+                {
+                    App.IsUserLoggedIn = true;
+                    App.AuthenticatedUser = user;
+                    LoggedIn();
+                }
             }
-            else
+            catch(Exception e)
             {
-                App.IsUserLoggedIn = true;
-                App.AuthenticatedUser = user;
-
-                LoggedIn();
+                return;
+            }
+            finally
+            {
+                EnabledLogin = true;
+                ButtonColor = "White";
+                LoginButtonText = "Login";
             }
         }
 

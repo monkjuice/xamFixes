@@ -27,13 +27,13 @@
 
             </StackLayout>
 
-            <Button Command="{Binding SubmitCommand}" Text="Login" TextColor="Black"  
+            <Button IsEnabled="{Binding EnabledLogin}" Command="{Binding SubmitCommand}" Text="{Binding LoginButtonText}" TextColor="Black"  
                     FontSize="Large" HorizontalOptions="Center" Margin="0,20,0,0"
-                    BackgroundColor="White" />
+                    BackgroundColor="{Binding ButtonColor}" />
 
             <Label VerticalTextAlignment="Center" HorizontalTextAlignment="center">or</Label>
 
-            <Button Clicked="RegisterPage" WidthRequest="200" Text="Create account" TextColor="Black"  
+            <Button IsEnabled="{Binding EnabledLogin}" Clicked="RegisterPage" WidthRequest="200" Text="Create account" TextColor="Black"  
                     FontSize="Small" HorizontalOptions="Center"
                     BackgroundColor="White" />
 

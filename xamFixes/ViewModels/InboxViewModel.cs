@@ -59,23 +59,17 @@ namespace xamFixes.ViewModels
 
                     var user = await _profileService.GetUserProfile(int.Parse(userid));
 
-                    if (convo == null)
-                        return;
-
                     string decrypted = Crypto.FixesCrypto.DecryptData(await SecureStorage.GetAsync(convo.ConversationId.ToString()), message);
 
-                    var listViewConversation = Conversations.Where(x => x.ConversationId == convo.ConversationId).FirstOrDefault();
-
-                    if (listViewConversation == null)
+                    if (convo == null)
                     {
                         convo.MessageBody = decrypted;
                         Conversations.Add(convo);
                     }
-                    else
-                    {
-                        listViewConversation.MessageBody = decrypted;
-                    }
+                    
+                    var listViewConversation = Conversations.Where(x => x.ConversationId == convo.ConversationId).FirstOrDefault();
 
+                    listViewConversation.MessageBody = decrypted;
 
                     _ = _inboxService.StoreMessage(_inboxService.CreateMessage(decrypted, int.Parse(userid)), convo.ConversationId, convo.UserId);
                 }

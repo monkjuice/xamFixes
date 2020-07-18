@@ -22,34 +22,7 @@ namespace xamFixes.Pages.Profile
             var vm = new EditProfileViewModel();
             this.BindingContext = vm;
             vm.DisplayError += async (string msg) => await DisplayError(msg);
-
-            //TakePicture.Clicked += async (sender, args) =>
-            //{
-            //    await CrossMedia.Current.Initialize();
-
-            //    if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
-            //    {
-            //        await DisplayAlert("No Camera", ":( No camera available.", "OK");
-            //        return;
-            //    }
-
-            //    var file = await CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions
-            //    {
-            //        Directory = "Fixes",
-            //        Name = DateTime.Now.ToString() + ".jpg"
-            //    });
-
-            //    if (file == null)
-            //        return;
-
-            //    vm.Picture = file;
-
-            //    ImagePreview.Source = ImageSource.FromStream(() =>
-            //    {
-            //        var stream = file.GetStream();
-            //        return stream;
-            //    });
-            //};
+            vm.MainPage += () => MainPage();
 
         }
 
@@ -58,7 +31,12 @@ namespace xamFixes.Pages.Profile
             await DisplayAlert("Error", msg, "OK");
         }
 
-        private void MainPage(object sender, EventArgs e)
+        private void Cancel_Clicked(object sender, EventArgs e)
+        {
+            Application.Current.MainPage = new MainPage();
+        }
+
+        private void MainPage()
         {
             Application.Current.MainPage = new MainPage();
         }

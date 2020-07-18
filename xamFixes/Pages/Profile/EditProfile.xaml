@@ -9,7 +9,7 @@
     <ContentPage.Content>
         <StackLayout>
 
-            <Button Clicked="MainPage" VerticalOptions="Start" HorizontalOptions="Start" BackgroundColor="Transparent" Text="Cancel"></Button>
+            <Button Clicked="Cancel_Clicked" VerticalOptions="Start" HorizontalOptions="Start" BackgroundColor="Transparent" Text="Cancel"></Button>
             
             <Button 
                 IsVisible="{Binding PreviewingPicture, Converter={Helpers:InverseBoolConverter} }"
@@ -42,6 +42,8 @@
 
             <Button 
                 Margin="0,20,0,0"
+                IsEnabled="{Binding EnabledUpload}"
+                BackgroundColor="{Binding ButtonColor}"
                 IsVisible="{Binding PreviewingPicture}"
                 Command="{Binding SubmitCommand}"
                 Text="Save"

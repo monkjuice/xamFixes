@@ -12,7 +12,7 @@ namespace xamFixes.Interfaces
     {
         Task<User> GetUserProfile(int userId);
 
-        Task<bool> UploadProfilePicture(MediaFile picture);
+        Task<string> UploadProfilePicture(MediaFile picture);
 
     }
 }

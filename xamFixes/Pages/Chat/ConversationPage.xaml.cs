@@ -1,6 +1,8 @@
 ﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using xamFixes.ViewModels;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace xamFixes.Pages.Chat
 {
@@ -10,12 +12,20 @@ namespace xamFixes.Pages.Chat
         public ConversationPage(ConversationViewModel vm)
         {
             this.BindingContext = vm;
+            vm.ScrollToBottom += () => ScrollToBottom();
             InitializeComponent();
+        }
+
+        public void ScrollToBottom()
+        {
+            var item = MessagesList.ItemsSource.Cast<object>().LastOrDefault();
+            MessagesList.ScrollTo(item, ScrollToPosition.End, true);
         }
 
         private void OpenChatCamera(object sender, System.EventArgs e)
         {
 
         }
+
     }
 }
