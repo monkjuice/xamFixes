@@ -20,7 +20,7 @@ namespace xamFixes.Repository
         });
 
         public SQLiteAsyncConnection Database => lazyInitializer.Value;
-        static bool initialized = false;
+        bool initialized = false;
 
         public FixesDatabase()
         {
@@ -31,7 +31,7 @@ namespace xamFixes.Repository
         {
             if (!initialized)
             {
-                if (!Database.TableMappings.Any(m => m.MappedType.Name == typeof(Conversation).Name))
+                if (!Database.TableMappings.Any(m => m.MappedType.Name == typeof(Message).Name))
                 {
                     await Database.CreateTablesAsync(CreateFlags.None, typeof(Conversation));
                     await Database.CreateTablesAsync(CreateFlags.None, typeof(UserInConversation));

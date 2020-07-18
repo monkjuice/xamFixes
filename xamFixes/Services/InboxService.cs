@@ -164,31 +164,9 @@ namespace xamFixes.Services
 
             if (conversationId == Guid.Empty)
             {
+                var conversation = await StoreConversation(recipientUserId);
 
-                var conversation = new Conversation()
-                {
-                    LastActivity = DateTime.Now
-                };
-
-                var convId = await db.SaveConversationAsync(conversation);
-
-                var uic = new UserInConversation()
-                {
-                    ConversationId = convId,
-                    UserId = App.AuthenticatedUser.UserId
-                };
-
-                var uic2 = new UserInConversation()
-                {
-                    ConversationId = convId,
-                    UserId = recipientUserId
-                };
-
-                _ = db.SaveUserInConversationAsync(uic).ConfigureAwait(false);
-                _ = db.SaveUserInConversationAsync(uic2).ConfigureAwait(false);
-
-                message.ConversationId = convId;
-
+                message.ConversationId = conversation.ConversationId;
             }
 
             _ = db.SaveMessage(message);
@@ -205,8 +183,6 @@ namespace xamFixes.Services
                 ConversationId = Guid.NewGuid(),
                 LastActivity = DateTime.Now
             };
-
-            var v = conversation.ConversationId;
 
             var convId = await db.SaveConversationAsync(conversation);
 

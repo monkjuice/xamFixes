@@ -14,17 +14,9 @@ namespace xamFixes.Repository.ORM
 
         async public Task<Guid> SaveConversationAsync(Conversation conversation)
         {
-
             try
             { 
-                if (await GetConversation(conversation.ConversationId) != null)
-                {
-                    _ = await Database.UpdateAsync(conversation);
-                }
-                else
-                {
-                    var t = await Database.InsertAsync(conversation);
-                }
+                var t = await Database.InsertAsync(conversation);
 
                 return conversation.ConversationId;
             }

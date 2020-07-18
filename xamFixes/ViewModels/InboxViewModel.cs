@@ -57,19 +57,21 @@ namespace xamFixes.ViewModels
                 { 
                     var convo = await _inboxService.FindConversation(int.Parse(userid));
 
+                    var listViewConversation = Conversations.Where(x => x.ConversationId == convo.ConversationId).FirstOrDefault();
+
                     var user = await _profileService.GetUserProfile(int.Parse(userid));
 
                     string decrypted = Crypto.FixesCrypto.DecryptData(await SecureStorage.GetAsync(convo.ConversationId.ToString()), message);
 
-                    if (convo == null)
+                    if (listViewConversation == null)
                     {
                         convo.MessageBody = decrypted;
                         Conversations.Add(convo);
                     }
-                    
-                    var listViewConversation = Conversations.Where(x => x.ConversationId == convo.ConversationId).FirstOrDefault();
-
-                    listViewConversation.MessageBody = decrypted;
+                    else
+                    {
+                        listViewConversation.MessageBody = decrypted;
+                    }
 
                     var messageId = Guid.NewGuid();
 
@@ -86,23 +88,31 @@ namespace xamFixes.ViewModels
             hubConnection.On<string, string>("RecieveHandshake", async (publickey, who) =>
             {
 
-                var conversation = await _inboxService.FindConversation(int.Parse(who));
+                try
+                {
+                    var conversation = await _inboxService.FindConversation(int.Parse(who));
 
-                if (conversation == null)
-                    conversation = await _inboxService.StoreConversation(int.Parse(who));
+                    if (conversation == null)
+                        conversation = await _inboxService.StoreConversation(int.Parse(who));
 
-                var user = await _profileService.GetUserProfile(int.Parse(who));
+                    var user = await _profileService.GetUserProfile(int.Parse(who));
 
-                // mine
-                KeyPair keypair = FixesCrypto.GenerateKeyPair();
-                await SecureStorage.SetAsync(conversation.ConversationId.ToString(), keypair.PrivateKey);
+                    // mine
+                    KeyPair keypair = FixesCrypto.GenerateKeyPair();
+                    await SecureStorage.SetAsync(conversation.ConversationId.ToString(), keypair.PrivateKey);
+ 
+                    // RespondHandshake
+                    await hubConnection.InvokeAsync("RespondHandshake", user.Username, keypair.PublicKey);
 
-                // RespondHandshake
-                await hubConnection.InvokeAsync("RespondHandshake", user.Username, keypair.PublicKey);
-
-                // theirs
-                await SecureStorage.SetAsync(Base64Encoder.Base64Encode(user.Username), publickey);
+                    // theirs
+                    await SecureStorage.SetAsync(Base64Encoder.Base64Encode(user.Username), publickey);
+                }
+                catch(Exception e)
+                {
+                    return;
+                }
             });
+
 
             hubConnection.On<string, string>("HandshakeResponse", async (publickey, who) =>
             {
