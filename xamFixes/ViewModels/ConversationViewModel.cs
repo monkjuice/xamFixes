@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -98,7 +99,7 @@ namespace xamFixes.ViewModels
 
                 _conversation.ConversationId = _conversation.ConversationId;
 
-                await SecureStorage.SetAsync(_conversation.ConversationId.ToString(), keypair.PrivateKey);
+                await SecureStorage.SetAsync(keypair.PublicKey.Substring(20,40), keypair.PrivateKey);
 
                 await hubConnection.InvokeAsync("SendHandshake", _conversation.RecipientUsername, keypair.PublicKey);
 
@@ -115,15 +116,14 @@ namespace xamFixes.ViewModels
 
         void RecieveMessage()
         {
-            hubConnection.On<byte[], string>("RecieveMessage", async (message, userid) =>
+            hubConnection.On<string, string>("RecieveMessage", async (message, userid) =>
             {
-                string decrypted = Crypto.FixesCrypto.DecryptData(await SecureStorage.GetAsync(_conversation.ConversationId.ToString()), message);
 
+                var parsedMsg = JsonConvert.DeserializeObject<MessageVM>(message);
 
-                // TODO: RECIEVE JSON MESSAGE... GRAB MESSAGE ID
-                var messageId = Guid.Empty;
+                string decrypted = Crypto.FixesCrypto.DecryptData(await SecureStorage.GetAsync(parsedMsg.PartialPublicKey), parsedMsg.EncryptedBody);
 
-                var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid), messageId);
+                var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid), parsedMsg.MessageId);
 
                 Messages.Add(prettyMsg);
 
@@ -153,15 +153,23 @@ namespace xamFixes.ViewModels
         {
             EnabledSend = false;
 
-            byte[] encryptedMsg =  Crypto.FixesCrypto.EncryptText(await SecureStorage.GetAsync(Base64Encoder.Base64Encode(recipientName)), message);
+            string publicKey = await SecureStorage.GetAsync(_conversation.ConversationId.ToString());
+
+            var msg = new MessageVM()
+            {
+                MessageId = Guid.NewGuid(),
+                EncryptedBody = Crypto.FixesCrypto.EncryptText(publicKey, message),
+                CreatedAt = DateTime.Now.ToString(),
+                PartialPublicKey = publicKey.Substring(20, 40)
+            };
 
             try 
             { 
-                await hubConnection.InvokeAsync("SendChatMessage", who, encryptedMsg);
+                await hubConnection.InvokeAsync("SendChatMessage", who, JsonConvert.SerializeObject(msg));
 
                 EnabledSend = true;
 
-                var prettyMsg = _inboxService.CreateMessage(message, App.AuthenticatedUser.UserId, Guid.Empty);
+                var prettyMsg = _inboxService.CreateMessage(message, App.AuthenticatedUser.UserId, msg.MessageId);
                 var result = await _inboxService.StoreMessage(prettyMsg, _conversation.ConversationId, _conversation.UserId);
 
                 Messages.Add(prettyMsg);

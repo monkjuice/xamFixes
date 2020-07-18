@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -51,17 +52,19 @@ namespace xamFixes.ViewModels
 
             await hubConnection.StartAsync();
 
-            hubConnection.On<byte[], string>("RecieveMessage", async (message, userid) =>
+            hubConnection.On<string, string>("RecieveMessage", async (message, userid) =>
             {
                 try 
-                { 
+                {
+                    var parsedMsg = JsonConvert.DeserializeObject<MessageVM>(message);
+
                     var convo = await _inboxService.FindConversation(int.Parse(userid));
 
                     var listViewConversation = Conversations.Where(x => x.ConversationId == convo.ConversationId).FirstOrDefault();
 
                     var user = await _profileService.GetUserProfile(int.Parse(userid));
 
-                    string decrypted = Crypto.FixesCrypto.DecryptData(await SecureStorage.GetAsync(convo.ConversationId.ToString()), message);
+                    string decrypted = Crypto.FixesCrypto.DecryptData(await SecureStorage.GetAsync(parsedMsg.PartialPublicKey), parsedMsg.EncryptedBody);
 
                     if (listViewConversation == null)
                     {
@@ -73,9 +76,7 @@ namespace xamFixes.ViewModels
                         listViewConversation.MessageBody = decrypted;
                     }
 
-                    var messageId = Guid.NewGuid();
-
-                    var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid), messageId);
+                    var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid), parsedMsg.MessageId);
 
                     _ = _inboxService.StoreMessage(prettyMsg, convo.ConversationId, convo.UserId);
                 }
@@ -87,7 +88,6 @@ namespace xamFixes.ViewModels
 
             hubConnection.On<string, string>("RecieveHandshake", async (publickey, who) =>
             {
-
                 try
                 {
                     var conversation = await _inboxService.FindConversation(int.Parse(who));
@@ -99,13 +99,13 @@ namespace xamFixes.ViewModels
 
                     // mine
                     KeyPair keypair = FixesCrypto.GenerateKeyPair();
-                    await SecureStorage.SetAsync(conversation.ConversationId.ToString(), keypair.PrivateKey);
+                    await SecureStorage.SetAsync(keypair.PublicKey.Substring(20,40), keypair.PrivateKey);
  
                     // RespondHandshake
                     await hubConnection.InvokeAsync("RespondHandshake", user.Username, keypair.PublicKey);
 
                     // theirs
-                    await SecureStorage.SetAsync(Base64Encoder.Base64Encode(user.Username), publickey);
+                    await SecureStorage.SetAsync(conversation.ConversationId.ToString(), publickey);
                 }
                 catch(Exception e)
                 {
@@ -113,12 +113,11 @@ namespace xamFixes.ViewModels
                 }
             });
 
-
             hubConnection.On<string, string>("HandshakeResponse", async (publickey, who) =>
             {
-                var user = await _profileService.GetUserProfile(int.Parse(who));
+                var conversation = await _inboxService.FindConversation(int.Parse(who));
 
-                await SecureStorage.SetAsync(Base64Encoder.Base64Encode(user.Username), publickey);
+                await SecureStorage.SetAsync(conversation.ConversationId.ToString(), publickey);
             });
 
         }

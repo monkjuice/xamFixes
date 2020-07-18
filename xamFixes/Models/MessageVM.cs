@@ -12,6 +12,8 @@ namespace xamFixes.Models
 
         public string Body { get; set; }
 
+        public byte[] EncryptedBody { get; set; }
+
         public bool Sent { get; set; }
 
         public bool IsBlob { get; set; }
@@ -21,5 +23,7 @@ namespace xamFixes.Models
         public int UserId { get; set; }
 
         public string CreatedAt { get; set; }
+
+        public string PartialPublicKey { get; set; }
     }
 }
