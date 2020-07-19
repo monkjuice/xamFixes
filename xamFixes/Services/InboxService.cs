@@ -12,11 +12,16 @@ using xamFixes.Repository.ORM;
 using xamFixes.Services.Utils;
 using xamFixes.DBModel;
 using Xamarin.Essentials;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
 
 namespace xamFixes.Services
 {
     public class InboxService : IInboxService
     {
+        private readonly HttpClient client = new HttpClient();
+
         private readonly IProfileService _profileService;
 
         public InboxService()
@@ -102,7 +107,7 @@ namespace xamFixes.Services
                     MessageId = m.MessageId,
                     Position = m.UserId == App.AuthenticatedUser.UserId ? LayoutOptions.End : LayoutOptions.Start,
                     CreatedAt = m.CreatedAt.ToString("t", CultureInfo.CreateSpecificCulture("en-US")),
-                    Sent = true
+                    IsSent = true
                 });
             }
 
@@ -117,7 +122,7 @@ namespace xamFixes.Services
                 MessageId = messageId,
                 Position = App.AuthenticatedUser.UserId == userId ? LayoutOptions.End : LayoutOptions.Start,
                 Body = msg,
-                Sent = true,
+                IsSent = true,
                 UserId = userId,
                 CreatedAt = DateTime.Now.ToString("yyyy")
             };
@@ -228,6 +233,44 @@ namespace xamFixes.Services
             }
 
             return conversation;
+        }
+
+        async public Task<bool> QueueMessage(string action, string who, string msgBody)
+        {
+            try
+            {
+                string _token = await SecureStorage.GetAsync("fixes_token");
+
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(
+                    new MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+
+                var oBody = new
+                {
+                    Action = action,
+                    Who = who,
+                    Body = msgBody
+                };
+
+                string requestBody = JsonConvert.SerializeObject(oBody);
+
+                var stringTask = client.PostAsync(Base.baseURL + "/api/inbox/queuemessage", new StringContent(requestBody, Encoding.UTF8, "application/json"));
+
+                var msg = await stringTask;
+
+                var jsonString = msg.Content.ReadAsStringAsync().Result.Replace("\\", "").Trim('"');
+
+                var response = JsonConvert.DeserializeObject<Base.Response>(jsonString);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
 
     }

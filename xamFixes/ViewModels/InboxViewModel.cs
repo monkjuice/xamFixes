@@ -79,6 +79,8 @@ namespace xamFixes.ViewModels
                     var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid), parsedMsg.MessageId);
 
                     _ = _inboxService.StoreMessage(prettyMsg, convo.ConversationId, convo.UserId);
+
+                    _ = hubConnection.InvokeAsync("RecievedMessage", user.Username, parsedMsg.MessageId);
                 }
                 catch(Exception e)
                 {

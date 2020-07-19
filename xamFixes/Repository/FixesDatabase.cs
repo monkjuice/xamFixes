@@ -33,9 +33,9 @@ namespace xamFixes.Repository
             {
                 if (!Database.TableMappings.Any(m => m.MappedType.Name == typeof(Message).Name))
                 {
-                    await Database.CreateTablesAsync(CreateFlags.None, typeof(Conversation));
-                    await Database.CreateTablesAsync(CreateFlags.None, typeof(UserInConversation));
-                    await Database.CreateTablesAsync(CreateFlags.None, typeof(Message));
+                    await Database.CreateTablesAsync(CreateFlags.None, typeof(Conversation)).ConfigureAwait(false);
+                    await Database.CreateTablesAsync(CreateFlags.None, typeof(UserInConversation)).ConfigureAwait(false);
+                    await Database.CreateTablesAsync(CreateFlags.None, typeof(Message)).ConfigureAwait(false);
 
                     initialized = true;
                 }

@@ -20,5 +20,6 @@ namespace xamFixes.Interfaces
         Task<ConversationVM> CreateConversation(ConversationVM convo);
         Task<ConversationVM> ResumeOrStartConversation(int userId, string username, string profilePicture);
         Task<ConversationVM> StoreConversation(int userid);
+        Task<bool> QueueMessage(string action, string who, string body);
     }
 }

@@ -35,7 +35,6 @@ namespace xamFixes.ViewModels
         private readonly IInboxService _inboxService;
         private readonly IProfileService _profileService;
 
-
         ConversationVM _conversation;
 
         public Command SendMessageCommand { get; }
@@ -71,7 +70,7 @@ namespace xamFixes.ViewModels
 
             RecieveMessage();
 
-            PersistHandshakeResponse();
+            HandshakeResponse();
         }
 
 
@@ -87,23 +86,29 @@ namespace xamFixes.ViewModels
             }
         }
 
+        bool RecipientIsOnline = false;
+
+        string MyPublicKey;
         async Task SendHandshake(int who)
         {
             try 
             {
+                ConnectionEstablished = false;
 
                 KeyPair keypair = FixesCrypto.GenerateKeyPair();
+
+                MyPublicKey = keypair.PublicKey;
 
                 if(_conversation.ConversationId == Guid.Empty)
                     _conversation = await _inboxService.StoreConversation(who);
 
                 _conversation.ConversationId = _conversation.ConversationId;
 
-                await SecureStorage.SetAsync(keypair.PublicKey.Substring(20,40), keypair.PrivateKey);
+                await SecureStorage.SetAsync(MyPublicKey.Substring(20,40), keypair.PrivateKey);
 
-                await hubConnection.InvokeAsync("SendHandshake", _conversation.RecipientUsername, keypair.PublicKey);
+                await hubConnection.InvokeAsync("SendHandshake", _conversation.RecipientUsername, MyPublicKey);
 
-                if (await SuccessfulHandshake(_conversation.RecipientUsername))
+                if (await SuccessfulHandshake())
                 {
                     ConnectionEstablished = true;
                 }
@@ -128,22 +133,24 @@ namespace xamFixes.ViewModels
                 Messages.Add(prettyMsg);
 
                 ScrollToBottom();
+
+                _ = hubConnection.InvokeAsync("ReadMessage", _conversation.RecipientUsername, parsedMsg.MessageId);
             });
         }
 
-        async public Task<bool> SuccessfulHandshake(string who, int tries = 0)
+        async public Task<bool> SuccessfulHandshake(int tries = 0)
         {
-            if (tries > 20)
+            if (tries > 5)
                 return false;
 
-            var exists = await SecureStorage.GetAsync(Base64Encoder.Base64Encode(who));
+            var exists = await SecureStorage.GetAsync(_conversation.ConversationId.ToString());
 
             if(exists != null)
                 return true;
             else
             {
-                Thread.Sleep(tries * 100);
-                return await SuccessfulHandshake(who, tries += 1);
+                Thread.Sleep(tries * 200);
+                return await SuccessfulHandshake(tries += 1);
             }
         }
 
@@ -164,8 +171,24 @@ namespace xamFixes.ViewModels
             };
 
             try 
-            { 
-                await hubConnection.InvokeAsync("SendChatMessage", who, JsonConvert.SerializeObject(msg));
+            {
+                var jsonBody = JsonConvert.SerializeObject(msg);
+
+                if (RecipientIsOnline)
+                { 
+                    // send 'live' message
+                    _ = hubConnection.InvokeAsync("SendChatMessage", who, jsonBody);
+                }
+                else if (ConnectionEstablished)
+                { 
+                    // queue encrypted message
+                    _ = _inboxService.QueueMessage("SendChatMessage", who, jsonBody);
+                }
+                else
+                { 
+                    // await for public key
+                    _ = _inboxService.QueueMessage("SendHandshake", _conversation.RecipientUsername, MyPublicKey);
+                }
 
                 EnabledSend = true;
 
@@ -185,18 +208,13 @@ namespace xamFixes.ViewModels
             }
         }
 
-        void PersistHandshakeResponse()
+        void HandshakeResponse()
         {
-            hubConnection.On<string, string>("HandshakeResponse", async (publickey, who) =>
+            hubConnection.On<string, string>("HandshakeResponse", (publickey, who) =>
             {
-                var user = await _profileService.GetUserProfile(int.Parse(who));
-
-                await SecureStorage.SetAsync(Base64Encoder.Base64Encode(user.Username), publickey);
-
-                ConnectionEstablished = true;
+                RecipientIsOnline = true;
             });
         }
-
 
         bool enabledSend = true;
         public bool EnabledSend
