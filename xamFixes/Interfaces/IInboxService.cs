@@ -14,12 +14,14 @@ namespace xamFixes.Interfaces
     {
         Task<ObservableCollection<ConversationVM>> GetLastConversations(int userId);
         Task<ObservableCollection<MessageVM>> GetConversationLastMessages(Guid conversationId);
-        MessageVM CreateMessage(string msg, int userId, Guid messageId);
-        Task<Message> StoreMessage(MessageVM msg, Guid conversationId, int recipientUserId);
+        MessageVM CreateMessage(string msg, int userId, Guid messageId, DateTime createdAt);
+        Task<Message> StoreMessage(MessageVM msg, Guid conversationId, int recipientUserId, bool isSent);
         Task<ConversationVM> FindConversation(int userId);
         Task<ConversationVM> CreateConversation(ConversationVM convo);
         Task<ConversationVM> ResumeOrStartConversation(int userId, string username, string profilePicture);
         Task<ConversationVM> StoreConversation(int userid);
         Task<bool> QueueMessage(string action, string who, string body);
+        Task<bool> UpdateMessageStatus(string action, Guid messageId);
+        Task<List<MessageVM>> SendUnsentMessages(int who);
     }
 }

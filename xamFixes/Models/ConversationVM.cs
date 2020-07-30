@@ -16,6 +16,8 @@ namespace xamFixes.Models
 
         public Xamarin.Forms.FontAttributes FontStyle { get; set; }
 
+        public string StatusFontColor { get; set; }
+
         public int UserId { get; set; }
 
         public string RecipientUsername { get; set; }

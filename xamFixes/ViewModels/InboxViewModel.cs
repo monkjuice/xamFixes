@@ -66,7 +66,7 @@ namespace xamFixes.ViewModels
 
                     string decrypted = Crypto.FixesCrypto.DecryptData(await SecureStorage.GetAsync(parsedMsg.PartialPublicKey), parsedMsg.EncryptedBody);
 
-                    if (listViewConversation == null)
+                     if (listViewConversation == null)
                     {
                         convo.MessageBody = decrypted;
                         Conversations.Add(convo);
@@ -74,11 +74,14 @@ namespace xamFixes.ViewModels
                     else
                     {
                         listViewConversation.MessageBody = decrypted;
+                        conversations.Remove(listViewConversation);
+                        conversations.Insert(0, listViewConversation);
+                        Conversations = conversations;
                     }
 
-                    var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid), parsedMsg.MessageId);
+                    var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid), parsedMsg.MessageId, parsedMsg.CreatedAt);
 
-                    _ = _inboxService.StoreMessage(prettyMsg, convo.ConversationId, convo.UserId);
+                    _ = _inboxService.StoreMessage(prettyMsg, convo.ConversationId, convo.UserId, true);
 
                     _ = hubConnection.InvokeAsync("RecievedMessage", user.Username, parsedMsg.MessageId);
                 }
@@ -120,8 +123,41 @@ namespace xamFixes.ViewModels
                 var conversation = await _inboxService.FindConversation(int.Parse(who));
 
                 await SecureStorage.SetAsync(conversation.ConversationId.ToString(), publickey);
+
+                //_ = SendUnsentMessages(int.Parse(who));
+
             });
 
+            _ = hubConnection.On<string, string>("RecipientRecievedMessage", async (messageId, who) =>
+              {
+                  Guid id;
+                  if (Guid.TryParse(messageId, out id))
+                      _ = _inboxService.UpdateMessageStatus("RecievedMessage", id);
+              });
+
+            hubConnection.On<string, string>("RecipientReadMessage", async (messageId, who) =>
+            {
+                Guid id;
+                if (Guid.TryParse(messageId, out id))
+                    _ = _inboxService.UpdateMessageStatus("ReadMessage", id);
+            });
+
+        }
+
+        async Task SendUnsentMessages(int who)
+        {
+            var msgs = await _inboxService.SendUnsentMessages(who);
+
+            var to = await _profileService.GetUserProfile(who);
+
+            var conversation = await _inboxService.ResumeOrStartConversation(who, to.Username, "");
+            //var vm = null;
+            
+            //foreach (var msg in msgs)
+            //{
+            //    vm.UnsentBody = msg.Body;
+            //    _ = vm.SendMessageCommand;
+            //}
         }
 
         ObservableCollection<ConversationVM> conversations = new ObservableCollection<ConversationVM>();

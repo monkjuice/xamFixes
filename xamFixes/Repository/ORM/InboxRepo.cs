@@ -48,7 +48,7 @@ namespace xamFixes.Repository.ORM
         {
             try
             {
-                var conversations = await Database.QueryAsync<Conversation>("Select * from Conversation;");
+                var conversations = await Database.QueryAsync<Conversation>("Select * from Conversation order by LastActivity desc;");
 
                 return conversations;
             }
@@ -88,7 +88,7 @@ namespace xamFixes.Repository.ORM
             try
             {
                 var msg = await Database.QueryAsync<Message>($@"Select * from Message m
-                    where m.ConversationId = '{conversationId}' order by m.MessageId desc limit 1;");
+                    where m.ConversationId = '{conversationId}' order by m.CreatedAt desc limit 1;");
 
                 return msg.FirstOrDefault();
             }
@@ -113,13 +113,6 @@ namespace xamFixes.Repository.ORM
             }
         }
 
-        async Task<ConversationVM> GetConversation(Guid conversationId)
-        {
-            var t = await Database.QueryAsync<ConversationVM>("Select * from Conversation where ConversationId = '" + conversationId.ToString() + "';");
-
-            return t.FirstOrDefault();
-        }
-
         async public Task<ConversationVM> FindConversation(int userId)
         {
             var t = await Database.QueryAsync<ConversationVM>($@"Select c.ConversationId, c.LastActivity 
@@ -130,6 +123,51 @@ namespace xamFixes.Repository.ORM
                 return t.First();
 
             return null;
+        }
+
+        async public Task<Conversation> GetConversation(Guid conversationId)
+        {
+            return await Database.Table<Conversation>().Where(x => x.ConversationId == conversationId).FirstOrDefaultAsync();
+        }
+
+        async public Task<Message> GetMessage(Guid messageId)
+        {
+            return await Database.Table<Message>().Where(x => x.MessageId == messageId).FirstOrDefaultAsync();
+        }
+
+        async public Task<int> UpdateConversation(Conversation conversation)
+        {
+            try
+            {
+                conversation.LastActivity = DateTime.Now;
+                return await Database.UpdateAsync(conversation);
+            }
+            catch (Exception e)
+            {
+                return -1;
+            }
+        }
+
+        async public Task<int> UpdateMessage(Message message)
+        {
+            try 
+            { 
+                return await Database.UpdateAsync(message);
+            }
+            catch(Exception e)
+            {
+                return -1;
+            }
+        }
+
+        async public Task<List<Message>> GetUnsentMessagesTo(int userId)
+        {
+            var t = await Database.QueryAsync<Message>($@"select * from message m
+                                                            join UserInConversation uc on uc.ConversationId = m.ConversationId
+                                                            where uc.UserId = {userId}
+                                                            and m.IsSent = false");
+
+            return t;
         }
 
     }

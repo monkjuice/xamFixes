@@ -31,8 +31,9 @@
                         HorizontalOptions="Center"
                         VerticalOptions="Center" 
                         TextColor="Black"
-                        FontAttributes="Bold"/>
-
+                        FontAttributes="{Binding FontStyle}"
+                        FontSize="16"
+                        />
                     <Label
                         FontSize="12"
                         HorizontalOptions="EndAndExpand"
@@ -46,24 +47,23 @@
                     HorizontalOptions="FillAndExpand"
                     Orientation="Horizontal"
                     VerticalOptions="Center">
+                    <!-- Label Margin top should be: this element fontsize - messagebody fontsize -->
                     <Label
-                        FontSize="15"
-                        HorizontalOptions="Start"
+                        WidthRequest="20"
+                        Margin="0,-10,5,10" 
+                        FontSize="25"
                         FontAttributes="{Binding FontStyle}"
-                        Text="{Binding Icon}" />
+                        TextColor="{Binding StatusFontColor}"
+                        VerticalOptions="StartAndExpand"
+                        HorizontalOptions="Start"
+                        Text="{Binding Icon}"
+                        />
                     <Label
                         FontSize="15"
-                        HorizontalOptions="Start"
                         FontAttributes="{Binding FontStyle}"
                         Text="{Binding MessageBody}"
                         TextColor="Gray"
                         XAlign="Start" />
-                    <!--<Image
-                        HeightRequest="20"
-                        HorizontalOptions="EndAndExpand"
-                        IsVisible="{Binding ChatPinned}"
-                        Source="pins.png"
-                        WidthRequest="20" />-->
                 </StackLayout>
                 <StackLayout
                     Margin="0,15,0,0" Padding="40,0,0,0"

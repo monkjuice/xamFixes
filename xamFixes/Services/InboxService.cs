@@ -42,6 +42,20 @@ namespace xamFixes.Services
             return conversation;
         }
 
+        private string BuildStatusFontColor(Message lastMsg)
+        {
+            if (lastMsg.UserId != App.AuthenticatedUser.UserId)
+                return "Gray";
+            if (lastMsg.IsRead)
+                return "Orange";
+            if (lastMsg.IsRecieved)
+                return "Blue";
+            if (lastMsg.IsSent)
+                return "LightGray";
+
+            return "Red";
+        }
+
         async public Task<ObservableCollection<ConversationVM>> GetLastConversations(int userId)
         {
             try
@@ -59,7 +73,6 @@ namespace xamFixes.Services
                     {
                         var conversationPreview = new ConversationVM();
                         conversationPreview.ConversationId = c.ConversationId;
-                        conversationPreview.LastActivity = DateTimeUtils.RelativeTime(c.LastActivity);
 
                         var usersInConv = await db.GetConversationParticipants(c.ConversationId, userId);
 
@@ -69,9 +82,11 @@ namespace xamFixes.Services
 
                         var lastMsg = await db.GetConversationLastMessage(c.ConversationId);
                         conversationPreview.MessageBody = lastMsg.Body;
-                        conversationPreview.Unread = lastMsg.Unread;
+                        conversationPreview.Unread = lastMsg.IsRead;
                         conversationPreview.Icon = lastMsg.UserId == App.AuthenticatedUser.UserId ? "→" : "←";
-                        conversationPreview.FontStyle = lastMsg.Unread ? FontAttributes.Bold : FontAttributes.None;
+                        conversationPreview.StatusFontColor = BuildStatusFontColor(lastMsg);
+                        conversationPreview.FontStyle = BuildFontAttributes(lastMsg);
+                        conversationPreview.LastActivity = DateTimeUtils.RelativeTime(lastMsg.CreatedAt);
 
                         conversationsPreview.Add(conversationPreview);
                     }
@@ -106,7 +121,7 @@ namespace xamFixes.Services
                     Body = m.Body,
                     MessageId = m.MessageId,
                     Position = m.UserId == App.AuthenticatedUser.UserId ? LayoutOptions.End : LayoutOptions.Start,
-                    CreatedAt = m.CreatedAt.ToString("t", CultureInfo.CreateSpecificCulture("en-US")),
+                    RelativeDate = m.CreatedAt.ToString("t", CultureInfo.CreateSpecificCulture("en-US")),
                     IsSent = true
                 });
             }
@@ -115,7 +130,7 @@ namespace xamFixes.Services
 
         }
 
-        public MessageVM CreateMessage(string msg, int userId, Guid messageId)
+        public MessageVM CreateMessage(string msg, int userId, Guid messageId, DateTime createdAt)
         {
             var msgVM = new MessageVM()
             {
@@ -124,10 +139,19 @@ namespace xamFixes.Services
                 Body = msg,
                 IsSent = true,
                 UserId = userId,
-                CreatedAt = DateTime.Now.ToString("yyyy")
-            };
+                CreatedAt = createdAt,
+                RelativeDate = DateTimeUtils.RelativeTime(createdAt)
+        };
 
             return msgVM;
+        }
+
+        FontAttributes BuildFontAttributes(Message lastMsg)
+        {
+            if (!lastMsg.IsRead && lastMsg.UserId != App.AuthenticatedUser.UserId)
+                return FontAttributes.Bold;
+            
+            return FontAttributes.None;
         }
 
         async public Task<ConversationVM> CreateConversation(ConversationVM c)
@@ -136,7 +160,6 @@ namespace xamFixes.Services
 
             var conversationPreview = new ConversationVM();
             conversationPreview.ConversationId = c.ConversationId;
-            conversationPreview.LastActivity = DateTimeUtils.RelativeTime(DateTime.Parse(c.LastActivity));
 
             var usersInConv = await db.GetConversationParticipants(c.ConversationId, App.AuthenticatedUser.UserId);
 
@@ -146,14 +169,16 @@ namespace xamFixes.Services
 
             var lastMsg = await db.GetConversationLastMessage(c.ConversationId);
             conversationPreview.MessageBody = lastMsg.Body;
-            conversationPreview.Unread = lastMsg.Unread;
+            conversationPreview.Unread = lastMsg.IsRead;
             conversationPreview.Icon = lastMsg.UserId == App.AuthenticatedUser.UserId ? "→" : "←";
-            conversationPreview.FontStyle = lastMsg.Unread ? FontAttributes.Bold : FontAttributes.None;
+            conversationPreview.FontStyle = BuildFontAttributes(lastMsg);
+           
+            conversationPreview.LastActivity = DateTimeUtils.RelativeTime(lastMsg.CreatedAt);
 
             return conversationPreview;
         }
 
-        async public Task<Message> StoreMessage(MessageVM msg, Guid conversationId, int recipientUserId)
+        async public Task<Message> StoreMessage(MessageVM msg, Guid conversationId, int recipientUserId, bool isSent)
         {
             var db = new InboxRepo();
 
@@ -163,8 +188,9 @@ namespace xamFixes.Services
                 UserId = msg.UserId,
                 Body = msg.Body,
                 ConversationId = conversationId != Guid.Empty ? conversationId : Guid.Empty,
-                CreatedAt = DateTime.Now,
-                Unread = true
+                CreatedAt = msg.CreatedAt,
+                IsRead = false,
+                IsSent = isSent
             };
 
             if (conversationId == Guid.Empty)
@@ -172,6 +198,10 @@ namespace xamFixes.Services
                 var conversation = await StoreConversation(recipientUserId);
 
                 message.ConversationId = conversation.ConversationId;
+            }
+            else
+            {
+                await db.UpdateConversation(await db.GetConversation(conversationId)).ConfigureAwait(false);
             }
 
             _ = db.SaveMessage(message);
@@ -271,6 +301,49 @@ namespace xamFixes.Services
             {
                 throw e;
             }
+        }
+
+        async public Task<bool> UpdateMessageStatus(string action, Guid messageId)
+        {
+            try
+            {
+                var db = new InboxRepo();
+                var message = await db.GetMessage(messageId);
+
+                switch (action)
+                {
+                    case "RecievedMessage":
+                        message.IsRecieved = true;
+                        break;
+                    case "ReadMessage":
+                        message.IsRead = true;
+                        break;
+                    case "SentMessage":
+                        message.IsSent = true;
+                        break;
+                }
+
+                _ = db.UpdateMessage(message);
+
+                return true;
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
+
+        async public Task<List<MessageVM>> SendUnsentMessages(int who)
+        {
+            var db = new InboxRepo();
+
+            var msgs = await db.GetUnsentMessagesTo(who);
+
+            return msgs.Select(x => new MessageVM()
+            {
+                Body = x.Body
+            }).ToList();
+            
         }
 
     }

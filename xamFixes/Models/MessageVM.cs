@@ -19,14 +19,20 @@ namespace xamFixes.Models
 
         public int UserId { get; set; }
 
-        public string CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
+
+        public string RelativeDate { get; set; }
 
         public string PartialPublicKey { get; set; }
 
         public bool IsSent { get; set; }
 
+        public bool IsRecieved { get; set; }
+
         public bool IsRead { get; set; }
 
         public bool IsBlob { get; set; }
+
+        public bool IsMine { get; set; }
     }
 }

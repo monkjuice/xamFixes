@@ -14,11 +14,15 @@ namespace xamFixes.DBModel
 
         public string Body { get; set; }
 
-        public bool Unread { get; set; }
-
         public int UserId { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public bool IsRead { get; set; }
+
+        public bool IsRecieved { get; set; }
+
+        public bool IsSent { get; set; }
 
     }
 }

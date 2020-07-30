@@ -52,7 +52,7 @@ namespace xamFixes.ViewModels
 
             SendMessageCommand = new Command(async () => { await SendMessage(_conversation.RecipientUsername, UnsentBody); });
 
-            _ = ConfigureHub();
+            _ = ConfigureHub().ConfigureAwait(false);
 
         }
 
@@ -81,7 +81,7 @@ namespace xamFixes.ViewModels
             get => connectionEstablished;
             set
             {
-                connectionEstablished = value; EnabledSend = value;
+                connectionEstablished = value;
                 OnPropertyChanged(nameof(ConnectionEstablished));
             }
         }
@@ -112,6 +112,10 @@ namespace xamFixes.ViewModels
                 {
                     ConnectionEstablished = true;
                 }
+
+                RecipientIsOnline = false;
+
+                return;
             }
             catch(Exception e)
             {
@@ -128,7 +132,7 @@ namespace xamFixes.ViewModels
 
                 string decrypted = Crypto.FixesCrypto.DecryptData(await SecureStorage.GetAsync(parsedMsg.PartialPublicKey), parsedMsg.EncryptedBody);
 
-                var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid), parsedMsg.MessageId);
+                var prettyMsg = _inboxService.CreateMessage(decrypted, int.Parse(userid), parsedMsg.MessageId, parsedMsg.CreatedAt);
 
                 Messages.Add(prettyMsg);
 
@@ -160,40 +164,51 @@ namespace xamFixes.ViewModels
         {
             EnabledSend = false;
 
-            string publicKey = await SecureStorage.GetAsync(_conversation.ConversationId.ToString());
+            Guid messageId = Guid.NewGuid();
 
-            var msg = new MessageVM()
+            try
             {
-                MessageId = Guid.NewGuid(),
-                EncryptedBody = Crypto.FixesCrypto.EncryptText(publicKey, message),
-                CreatedAt = DateTime.Now.ToString(),
-                PartialPublicKey = publicKey.Substring(20, 40)
-            };
+                bool isSent;
+                //await SendHandshake(_conversation.UserId);
+                //Thread.Sleep(100);
+                if (RecipientIsOnline || ConnectionEstablished)
+                {
+                    string publicKey = await SecureStorage.GetAsync(_conversation.ConversationId.ToString());
 
-            try 
-            {
-                var jsonBody = JsonConvert.SerializeObject(msg);
+                    var msg = new SecureMessage()
+                    {
+                        MessageId = messageId,
+                        EncryptedBody = Crypto.FixesCrypto.EncryptText(publicKey, message),
+                        CreatedAt = DateTime.Now.ToString(),
+                        PartialPublicKey = publicKey.Substring(20, 40)
+                    };
 
-                if (RecipientIsOnline)
-                { 
-                    // send 'live' message
-                    _ = hubConnection.InvokeAsync("SendChatMessage", who, jsonBody);
-                }
-                else if (ConnectionEstablished)
-                { 
-                    // queue encrypted message
-                    _ = _inboxService.QueueMessage("SendChatMessage", who, jsonBody);
+                    var jsonBody = JsonConvert.SerializeObject(msg);
+
+                    if(RecipientIsOnline)
+                    { 
+                        // send 'live' message
+                        _ = hubConnection.InvokeAsync("SendChatMessage", who, jsonBody);
+                    }
+                    else if (ConnectionEstablished)
+                    {
+                        // queue encrypted message
+                        _ = _inboxService.QueueMessage("RecieveMessage", who, jsonBody);
+                    }
+
+                    isSent = true;
                 }
                 else
-                { 
-                    // await for public key
-                    _ = _inboxService.QueueMessage("SendHandshake", _conversation.RecipientUsername, MyPublicKey);
+                {
+                    // store message locally, await for public key
+                    isSent = false;
+                    _ = _inboxService.QueueMessage("RecieveHandshake", _conversation.RecipientUsername, MyPublicKey);
                 }
 
                 EnabledSend = true;
 
-                var prettyMsg = _inboxService.CreateMessage(message, App.AuthenticatedUser.UserId, msg.MessageId);
-                var result = await _inboxService.StoreMessage(prettyMsg, _conversation.ConversationId, _conversation.UserId);
+                var prettyMsg = _inboxService.CreateMessage(message, App.AuthenticatedUser.UserId, messageId, DateTime.Now);
+                var result = await _inboxService.StoreMessage(prettyMsg, _conversation.ConversationId, _conversation.UserId, isSent);
 
                 Messages.Add(prettyMsg);
 
