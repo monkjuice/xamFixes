@@ -15,7 +15,8 @@
             <ContentView>
                 <StackLayout>
                     <StackLayout>
-                        <ListView x:Name="MessagesList"
+                        <ListView 
+                                x:Name="MessagesList"
                                 CachingStrategy="RecycleElement"
                                 HasUnevenRows="True"
                                 ItemsSource="{Binding Messages}"

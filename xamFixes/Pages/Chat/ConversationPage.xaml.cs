@@ -16,6 +16,13 @@ namespace xamFixes.Pages.Chat
             InitializeComponent();
         }
 
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            ScrollToBottom();
+        }
+
         public void ScrollToBottom()
         {
             var item = MessagesList.ItemsSource.Cast<object>().LastOrDefault();
