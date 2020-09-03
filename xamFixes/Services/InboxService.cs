@@ -95,7 +95,6 @@ namespace xamFixes.Services
                         //broken convo
                         continue;
                     }
-
                 }
 
                 return conversationsPreview;
